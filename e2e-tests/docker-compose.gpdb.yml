@@ -1,7 +1,7 @@
 version: '3'
 services:
   master:
-    image: greenplum:${TAG}
+    image: ${IMAGE_NAME}:${TAG}
     container_name: master
     hostname: master
     ports:
@@ -32,7 +32,7 @@ services:
       - greenplum
 
   segment1:
-    image: greenplum:${TAG}
+    image: ${IMAGE_NAME}:${TAG}
     container_name: segment1
     hostname: segment1
     command: /start_gpdb.sh "00:primary" "01:primary"
@@ -46,7 +46,7 @@ services:
       - greenplum
 
   segment2:
-    image: greenplum:${TAG}
+    image: ${IMAGE_NAME}:${TAG}
     container_name: segment2
     hostname: segment2
     command: /start_gpdb.sh "00:primary" "01:primary"

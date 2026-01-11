@@ -2,7 +2,7 @@
 
 The following architecture is used to run the tests:
 
-* Separate containers with Greenplum. This is the `docker-greenplum` image.
+* Separate containers with Greenplum (GPDB, Greengage, or WarehousePG).
 * Separate containers for MinIO and nginx. Official images [minio/minio](https://hub.docker.com/r/minio/minio), [minio/mc](https://hub.docker.com/r/minio/mc) and [nginx](https://hub.docker.com/_/nginx) are used. It's necessary for S3 compatible storage for WAL archiving and backups.
 
 ## Prerequisites
@@ -11,7 +11,7 @@ Before running tests:
 
 1. Build Greenplum docker images as described in [Build section](../README.md#build).
 
-2. Configure test environment by editing `e2e-tests/.env` file if needed (default: `GPDB 6.27.1`).
+2. Configure test environment by editing `e2e-tests/.env` file if needed (default: `GPDB 6.27.1`, other supported: `Greengage`, `WarehousePG`).
 
 3. Prepare password files as described in [Prepare section](../README.md#prepare) for Docker Compose. In tests used ssh keys from `e2e-tests/conf/ssh/` directory, so you can use them or create your own.
 
@@ -26,7 +26,7 @@ make test-e2e
 
 Primary cluster is described in `e2e-tests/docker-compose.gpdb.yml`, standby cluster is described in `e2e-tests/docker-compose.gpdb-restore.yml`, and S3 compatible storage is described in `e2e-tests/docker-compose.s3.yml`.
 
-The test validates WAL-G backup and restore functionality for Greenplum:
+The test validates WAL-G backup and restore functionality for Greenplum (works with GPDB and WarehousePG; **not supported for Greengage** due to changed database flavor):
 
 1. **Full backup test**:
    - Creates full backup on primary cluster

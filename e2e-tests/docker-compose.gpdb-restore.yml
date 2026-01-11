@@ -1,7 +1,7 @@
 version: '3'
 services:
   master-restore:
-    image: greenplum:${RESTORE_TAG}
+    image: ${IMAGE_NAME}:${RESTORE_TAG}
     container_name: master-restore
     hostname: master
     ports:
@@ -31,7 +31,7 @@ services:
       - greenplum-restore
 
   segment1-restore:
-    image: greenplum:${RESTORE_TAG}
+    image: ${IMAGE_NAME}:${RESTORE_TAG}
     container_name: segment1-restore
     hostname: segment1
     command: /start_gpdb.sh "00:primary" "01:primary"
@@ -45,7 +45,7 @@ services:
       - greenplum-restore
 
   segment2-restore:
-    image: greenplum:${RESTORE_TAG}
+    image: ${IMAGE_NAME}:${RESTORE_TAG}
     container_name: segment2-restore
     hostname: segment2
     command: /start_gpdb.sh "00:primary" "01:primary"
