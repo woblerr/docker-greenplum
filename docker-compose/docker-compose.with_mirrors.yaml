@@ -23,6 +23,7 @@ services:
       - gpmon_password
     volumes:
       # - gpdb-master-data:/data
+      # - ../docs/custom_init_scripts:/docker-entrypoint-initdb.d
       - ./conf/${CONFIG_FOLDER}/gpinitsystem_config_with_mirrors:/tmp/gpinitsystem_config
       - ./conf/hostfile_gpinitsystem:/tmp/hostfile_gpinitsystem
       - ./conf/ssh/id_rsa:/home/gpadmin/.ssh/id_rsa

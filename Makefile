@@ -6,6 +6,8 @@ GREENGAGE_6_VERSIONS = 6.29.2
 TAG_GREENGAGE_6 ?= 6.29.2
 GREENGAGE_7_VERSIONS = 7.4.1
 TAG_GREENGAGE_7 ?= 7.4.1
+WAREHOUSEPG_6_VERSIONS = 6.27.2-WHPG
+TAG_WAREHOUSEPG_6 ?= 6.27.2-WHPG
 UBUNTU_OS_VERSION = ubuntu22.04
 OL_OS_VERSION = oraclelinux8
 UID := $(shell id -u)
@@ -53,6 +55,14 @@ build_greengage_7_ubuntu:
 build_greengage_7_oraclelinux:
 	$(call build_greengage_image_with_tag,7,$(TAG_GREENGAGE_7),$(OL_OS_VERSION))
 
+.PHONY: build_warehousepg_6_ubuntu
+build_warehousepg_6_ubuntu:
+	$(call build_warehousepg_image_with_tag,6,$(TAG_WAREHOUSEPG_6),$(UBUNTU_OS_VERSION))
+
+.PHONY: build_warehousepg_6_oraclelinux
+build_warehousepg_6_oraclelinux:
+	$(call build_warehousepg_image_with_tag,6,$(TAG_WAREHOUSEPG_6),$(OL_OS_VERSION))
+
 .PHONY: test-e2e
 test-e2e:
 	$(MAKE) -C e2e-tests test-e2e
@@ -77,3 +87,7 @@ define build_greengage_image_with_tag
 	docker buildx build -f docker/greengage/$(3)/$(1)/Dockerfile --build-arg GPDB_VERSION=$(2) -t greengage:$(2)-$(3) .
 endef
 
+define build_warehousepg_image_with_tag
+	@echo "Build WarehousePG $(1):$(2) $(3) docker image"
+	docker buildx build -f docker/warehousepg/$(3)/$(1)/Dockerfile --build-arg GPDB_VERSION=$(2) -t warehousepg:$(2)-$(3) .
+endef
