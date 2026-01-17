@@ -59,8 +59,6 @@ RUN apt-get update \
         zlib1g-dev \
         libldap-dev \
         libossp-uuid-dev \
-        krb5-kdc \
-        krb5-admin-server \
         locales \
         net-tools \
         ninja-build \
@@ -271,7 +269,6 @@ RUN apt-get update \
         less \
         locales \
         iproute2 \
-        libcurl3-gnutls \
         python3 \
         python3-psutil \
         python3-pygresql \

@@ -347,9 +347,9 @@ RUN groupadd --gid ${GREENPLUM_GID} ${GREENPLUM_GROUP} \
         /home/${GREENPLUM_USER}/ \
         ${GREENPLUM_DATA_DIRECTORY} \
         /docker-entrypoint-initdb.d \
-&& unlink /etc/localtime \
-&& cp /usr/share/zoneinfo/${TZ} /etc/localtime \
-&& echo "${TZ}" > /etc/timezone
+    && unlink /etc/localtime \
+    && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
+    && echo "${TZ}" > /etc/timezone
 
 COPY --from=go_builder /usr/local/greenplum-db /usr/local/greenplum-db
 COPY --from=builder \
