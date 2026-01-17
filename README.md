@@ -5,6 +5,7 @@
 [![build-greengage6](https://github.com/woblerr/docker-greenplum/actions/workflows/build-greengage6.yml/badge.svg)](https://github.com/woblerr/docker-greenplum/actions/workflows/build-greengage6.yml)
 [![build-greengage7](https://github.com/woblerr/docker-greenplum/actions/workflows/build-greengage7.yml/badge.svg)](https://github.com/woblerr/docker-greenplum/actions/workflows/build-greengage7.yml)
 [![build-warehousepg6](https://github.com/woblerr/docker-greenplum/actions/workflows/build-warehousepg6.yml/badge.svg)](https://github.com/woblerr/docker-greenplum/actions/workflows/build-warehousepg6.yml)
+[![build-warehousepg7](https://github.com/woblerr/docker-greenplum/actions/workflows/build-warehousepg7.yml/badge.svg)](https://github.com/woblerr/docker-greenplum/actions/workflows/build-warehousepg7.yml)
 
 This project provides Docker images for running Greenplum Database (GPDB) and its forks in containers. It supports both single-node and multi-node deployments. The images can be used for development, testing, and learning purposes.
 
@@ -74,6 +75,11 @@ WarehousePG 6:
 | WarehousePG Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
 |---|---|---| ---|
 | 6.27.2-WHPG| `6.27.2-WHPG`, `6.27.2-WHPG-ubuntu22.04` | `6.27.2-WHPG-oraclelinux8` | `linux/amd64`, `linux/arm64` |
+
+WarehousePG 7:
+| WarehousePG Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
+|---|---|---| ---|
+| 7.3.0-WHPG| `7.3.0-WHPG`, `7.3.0-WHPG-ubuntu22.04` | `7.3.0-WHPG-oraclelinux8` | `linux/amd64`, `linux/arm64` |
 
 ## Pull
 Change `tag` to the version you need.
@@ -311,10 +317,16 @@ For Ubuntu based images:
 ```bash
 make build_warehousepg_6_ubuntu TAG_WAREHOUSEPG_6=6.27.2-WHPG
 ```
+```bash
+make build_warehousepg_7_ubuntu TAG_WAREHOUSEPG_7=7.3.0-WHPG
+```
 
 For Oracle Linux based images:
 ```bash
 make build_warehousepg_6_oraclelinux TAG_WAREHOUSEPG_6=6.27.2-WHPG
+```
+```bash
+make build_warehousepg_7_oraclelinux TAG_WAREHOUSEPG_7=7.3.0-WHPG
 ```
 
 **Manual build examples:**
@@ -344,10 +356,16 @@ WarehousePG simple manual build:
 ```bash
 docker buildx build -f docker/warehousepg/ubuntu22.04/6/Dockerfile -t warehousepg:6.27.2-WHPG .
 ```
+```bash
+docker buildx build -f docker/warehousepg/ubuntu22.04/7/Dockerfile -t warehousepg:7.3.0-WHPG .
+```
 
 WarehousePG OracleLinux manual build:
 ```bash
 docker buildx build -f docker/warehousepg/oraclelinux8/6/Dockerfile -t warehousepg:6.27.2-WHPG-oraclelinux8 .
+```
+```bash
+docker buildx build -f docker/warehousepg/oraclelinux8/7/Dockerfile -t warehousepg:7.3.0-WHPG-oraclelinux8 .
 ```
 
 Manual build with specific component version for `linux/amd64` platform:

@@ -8,6 +8,8 @@ GREENGAGE_7_VERSIONS = 7.4.1
 TAG_GREENGAGE_7 ?= 7.4.1
 WAREHOUSEPG_6_VERSIONS = 6.27.2-WHPG
 TAG_WAREHOUSEPG_6 ?= 6.27.2-WHPG
+WAREHOUSEPG_7_VERSIONS = 7.3.0-WHPG
+TAG_WAREHOUSEPG_7 ?= 7.3.0-WHPG
 UBUNTU_OS_VERSION = ubuntu22.04
 OL_OS_VERSION = oraclelinux8
 UID := $(shell id -u)
@@ -62,6 +64,14 @@ build_warehousepg_6_ubuntu:
 .PHONY: build_warehousepg_6_oraclelinux
 build_warehousepg_6_oraclelinux:
 	$(call build_warehousepg_image_with_tag,6,$(TAG_WAREHOUSEPG_6),$(OL_OS_VERSION))
+
+.PHONY: build_warehousepg_7_ubuntu
+build_warehousepg_7_ubuntu:
+	$(call build_warehousepg_image_with_tag,7,$(TAG_WAREHOUSEPG_7),$(UBUNTU_OS_VERSION))
+
+.PHONY: build_warehousepg_7_oraclelinux
+build_warehousepg_7_oraclelinux:
+	$(call build_warehousepg_image_with_tag,7,$(TAG_WAREHOUSEPG_7),$(OL_OS_VERSION))
 
 .PHONY: test-e2e
 test-e2e:

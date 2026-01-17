@@ -68,8 +68,6 @@ RUN apt-get update \
         zlib1g-dev \
         libldap-dev \
         libossp-uuid-dev \
-        krb5-kdc \
-        krb5-admin-server \
         locales \
         net-tools \
         ninja-build \
@@ -333,7 +331,7 @@ RUN groupadd --gid ${GREENPLUM_GID} ${GREENPLUM_GROUP} \
 
 COPY --from=go_builder /usr/local/greenplum-db /usr/local/greenplum-db
 COPY --from=builder \
-    /usr/local/lib/libxerces-c.so \ 
+    /usr/local/lib/libxerces-c.so \
     /usr/local/lib/libxerces-c-3.1.so \
     /usr/local/lib/libsigar.so \
     /usr/local/greenplum-db/lib/

@@ -94,7 +94,7 @@ RUN dnf -y install \
     && dnf clean all \
     && rm -rf /var/cache/dnf \
     && echo -e "/usr/local/lib\n/usr/local/lib64\n" >> /etc/ld.so.conf.d/local.conf \
-    && ldconfig 
+    && ldconfig
 
 # xerces-c
 RUN wget ${GPXERCES_DOWNLOAD_URL}/${GPXERCES_VERSION}.tar.gz -O /tmp/gp-xerces-${GPXERCES_VERSION}.tar.gz \
@@ -132,7 +132,6 @@ RUN wget ${GPDB_DOWNLOAD_URL}/${GPDB_VERSION}.tar.gz -O /tmp/gpdb-${GPDB_VERSION
     && rm -rf \
         /tmp/gpdb \
         /tmp/gpdb-${GPDB_VERSION}.tar.gz
-
 
 # Now install PyGreSQL after Greenplum is copied
 # No available in EPEL
@@ -348,13 +347,13 @@ RUN groupadd --gid ${GREENPLUM_GID} ${GREENPLUM_GROUP} \
         /home/${GREENPLUM_USER}/ \
         ${GREENPLUM_DATA_DIRECTORY} \
         /docker-entrypoint-initdb.d \
-&& unlink /etc/localtime \
-&& cp /usr/share/zoneinfo/${TZ} /etc/localtime \
-&& echo "${TZ}" > /etc/timezone
+    && unlink /etc/localtime \
+    && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
+    && echo "${TZ}" > /etc/timezone
 
 COPY --from=go_builder /usr/local/greenplum-db /usr/local/greenplum-db
 COPY --from=builder \
-    /usr/local/lib/libxerces-c.so \ 
+    /usr/local/lib/libxerces-c.so \
     /usr/local/lib/libxerces-c-3.1.so \
     /usr/local/greenplum-db/lib/
 
