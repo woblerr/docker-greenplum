@@ -215,7 +215,6 @@ RUN wget ${PXF_DOWNLOAD_URL}/${PXF_VERSION}.tar.gz -O /tmp/pxf-${PXF_VERSION}.ta
     && rm -rf \
         /tmp/pxf \
         /tmp/pxf-${PXF_VERSION}.tar.gz
-        
 
 FROM ubuntu:${UBUNTU_VERSION} AS final
 
@@ -297,11 +296,10 @@ RUN groupadd --gid ${GREENPLUM_GID} ${GREENPLUM_GROUP} \
     && echo "${GREENPLUM_USER} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
     && echo "source /usr/local/greenplum-db/greenplum_path.sh" > /home/${GREENPLUM_USER}/.bashrc \
     && ARCH=$(dpkg --print-architecture) \
-    && arch="$(dpkg --print-architecture)" \
-    && case "${arch}" in \
+    && case "${ARCH}" in \
         arm64) echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-arm64" >> /home/${GREENPLUM_USER}/.bashrc ;; \
         amd64) echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> /home/${GREENPLUM_USER}/.bashrc ;; \
-        *) echo >&2 "error: unknown/unsupported architecture '${arch}'"; exit 1 ;; \
+        *) echo >&2 "error: unknown/unsupported architecture '${ARCH}'"; exit 1 ;; \
     esac \
     && echo 'export PATH="/usr/local/pxf/bin:${PATH}"' >> /home/${GREENPLUM_USER}/.bashrc \
     && echo "export PXF_BASE=${GREENPLUM_DATA_DIRECTORY}/pxf" >> /home/${GREENPLUM_USER}/.bashrc \

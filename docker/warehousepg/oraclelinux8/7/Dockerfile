@@ -96,7 +96,7 @@ RUN dnf -y install \
     && dnf clean all \
     && rm -rf /var/cache/dnf \
     && echo -e "/usr/local/lib\n/usr/local/lib64\n" >> /etc/ld.so.conf.d/local.conf \
-    && ldconfig 
+    && ldconfig
 
 # xerces-c
 RUN wget ${GPXERCES_DOWNLOAD_URL}/${GPXERCES_VERSION}.tar.gz -O /tmp/gp-xerces-${GPXERCES_VERSION}.tar.gz \
