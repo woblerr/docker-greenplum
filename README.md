@@ -6,6 +6,7 @@
 [![build-greengage7](https://github.com/woblerr/docker-greenplum/actions/workflows/build-greengage7.yml/badge.svg)](https://github.com/woblerr/docker-greenplum/actions/workflows/build-greengage7.yml)
 [![build-warehousepg6](https://github.com/woblerr/docker-greenplum/actions/workflows/build-warehousepg6.yml/badge.svg)](https://github.com/woblerr/docker-greenplum/actions/workflows/build-warehousepg6.yml)
 [![build-warehousepg7](https://github.com/woblerr/docker-greenplum/actions/workflows/build-warehousepg7.yml/badge.svg)](https://github.com/woblerr/docker-greenplum/actions/workflows/build-warehousepg7.yml)
+[![build-opengpdb6](https://github.com/woblerr/docker-greenplum/actions/workflows/build-opengpdb6.yml/badge.svg)](https://github.com/woblerr/docker-greenplum/actions/workflows/build-opengpdb6.yml)
 
 This project provides Docker images for running Greenplum Database (GPDB) and its forks in containers. It supports both single-node and multi-node deployments. The images can be used for development, testing, and learning purposes.
 
@@ -13,6 +14,7 @@ This project provides Docker images for running Greenplum Database (GPDB) and it
 - Greenplum Database (GPDB)
 - [Greengage](https://github.com/GreengageDB/greengage) (GGDB)
 - [WarehousePG](https://github.com/warehouse-pg/warehouse-pg) (WHPG)
+- [open-gpdb](https://github.com/open-gpdb/gpdb)
 
 The Greenplum in docker provides the following features:
 - single-node deployment;
@@ -81,6 +83,11 @@ WarehousePG 7:
 |---|---|---| ---|
 | 7.3.0-WHPG| `7.3.0-WHPG`, `7.3.0-WHPG-ubuntu22.04` | `7.3.0-WHPG-oraclelinux8` | `linux/amd64`, `linux/arm64` |
 
+open-gpdb 6:
+| open-gpdb Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
+|---|---|---| ---|
+| 6.29.3| `6.29.3`, `6.29.3-ubuntu22.04` | - | `linux/amd64`, `linux/arm64` |
+
 ## Pull
 Change `tag` to the version you need.
 
@@ -124,6 +131,21 @@ docker pull woblerr/warehousepg:tag
 
 ```bash
 docker pull ghcr.io/woblerr/warehousepg:tag
+```
+
+
+**open-gpdb:**
+
+* Docker Hub:
+
+```bash
+docker pull woblerr/opengpdb:tag
+```
+
+* GitHub Registry:
+
+```bash
+docker pull ghcr.io/woblerr/opengpdb:tag
 ```
 
 ## Run
@@ -329,6 +351,13 @@ make build_warehousepg_6_oraclelinux TAG_WAREHOUSEPG_6=6.27.2-WHPG
 make build_warehousepg_7_oraclelinux TAG_WAREHOUSEPG_7=7.3.0-WHPG
 ```
 
+**open-gpdb:**
+
+For Ubuntu based images:
+```bash
+make build_opengpdb_6_ubuntu TAG_OPENGPDB_6=6.29.3
+```
+
 **Manual build examples:**
 
 Greenplum simple manual build:
@@ -366,6 +395,11 @@ docker buildx build -f docker/warehousepg/oraclelinux8/6/Dockerfile -t warehouse
 ```
 ```bash
 docker buildx build -f docker/warehousepg/oraclelinux8/7/Dockerfile -t warehousepg:7.3.0-WHPG-oraclelinux8 .
+```
+
+open-gpdb simple manual build:
+```bash
+docker buildx build -f docker/opengpdb/ubuntu22.04/6/Dockerfile -t opengpdb:6.29.3 .
 ```
 
 Manual build with specific component version for `linux/amd64` platform:
