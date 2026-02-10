@@ -87,6 +87,9 @@ test-e2e:
 test-e2e-walg:
 	$(MAKE) -C e2e-tests test-e2e-walg
 
+.PHONY: test-e2e-yezzey
+test-e2e-yezzey:
+	$(MAKE) -C e2e-tests test-e2e-yezzey
 
 define build_image
 	@echo "Build GPDB $(1):$(2) $(3) docker image"

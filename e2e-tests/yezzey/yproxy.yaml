@@ -1,0 +1,13 @@
+socket_path: "/tmp/yproxy.sock"
+storage:
+  storage_endpoint: "http://minio:9000"
+  storage_bucket: "yezzey"
+  storage_prefix: ""
+  storage_region: "us-west-1"
+  access_key_id: "demo"
+  secret_access_key: "demoBackup"
+
+logging:
+  level: "info"
+  format: "json"
+  output: "/data/yproxy.log"

@@ -1,0 +1,94 @@
+version: '3'
+
+services:
+  createbucket-yezzey:
+    image: minio/mc:${IMAGE_TAG_MINIO_MC}
+    container_name: createbucket-yezzey
+    environment:
+      - "MINIO_ROOT_USER"
+      - "MINIO_ROOT_PASSWORD"
+      - "S3_MINIO_KEY"
+      - "S3_MINIO_KEY_SECRET"
+      - "S3_MINIO_HOSTNAME"
+    depends_on:
+      minio:
+        condition: service_healthy
+      nginx:
+        condition: service_started
+    entrypoint: >
+      /bin/sh -c '
+      mc alias set \
+        "${S3_MINIO_HOSTNAME}" \
+        http://minio:9000 \
+        "${MINIO_ROOT_USER}" \
+        "${MINIO_ROOT_PASSWORD}";
+      mc mb "${S3_MINIO_HOSTNAME}"/yezzey;
+      mc admin user add "${S3_MINIO_HOSTNAME}" "${S3_MINIO_KEY}" "${S3_MINIO_KEY_SECRET}";
+      mc admin policy attach "${S3_MINIO_HOSTNAME}" readwrite --user="${S3_MINIO_KEY}";
+      exit 0;
+      '
+    networks:
+      - greenplum
+
+  master:
+    image: ${IMAGE_NAME}:${TAG}
+    container_name: master
+    hostname: master
+    ports:
+      - "${EXPOSE_MASTER_PORT}:5432"
+    environment:
+      - GREENPLUM_DEPLOYMENT=master
+      - GREENPLUM_YEZZEY_ENABLE=true
+      - GREENPLUM_PASSWORD_FILE=/run/secrets/gpdb_password
+    secrets:
+      - gpdb_password
+    volumes:
+      - ../docker-compose/conf/${CONFIG_FOLDER}/gpinitsystem_config_no_mirrors:/tmp/gpinitsystem_config
+      - ../docker-compose/conf/hostfile_gpinitsystem:/tmp/hostfile_gpinitsystem
+      - ../docker-compose/conf/ssh/id_rsa:/home/gpadmin/.ssh/id_rsa
+      - ../docker-compose/conf/ssh/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
+      - ./yezzey/yproxy.yaml:/data/yproxy.yaml
+      - ./yezzey/init_scripts/yezzey_init.sql:/docker-entrypoint-initdb.d/yezzey_init.sql
+    depends_on:
+      - segment1
+      - segment2
+      - createbucket-yezzey
+    networks:
+      - greenplum
+
+  segment1:
+    image: ${IMAGE_NAME}:${TAG}
+    container_name: segment1
+    hostname: segment1
+    command: /start_gpdb.sh "00:primary" "01:primary"
+    environment:
+      - GREENPLUM_DEPLOYMENT=segment
+      - GREENPLUM_YEZZEY_ENABLE=true
+    volumes:
+      - ../docker-compose/conf/ssh/authorized_keys:/tmp/authorized_keys
+      - ./yezzey/yproxy.yaml:/data/yproxy.yaml
+    stop_grace_period: 60s
+    networks:
+      - greenplum
+
+  segment2:
+    image: ${IMAGE_NAME}:${TAG}
+    container_name: segment2
+    hostname: segment2
+    command: /start_gpdb.sh "00:primary" "01:primary"
+    environment:
+      - GREENPLUM_DEPLOYMENT=segment
+      - GREENPLUM_YEZZEY_ENABLE=true
+    volumes:
+      - ../docker-compose/conf/ssh/authorized_keys:/tmp/authorized_keys
+      - ./yezzey/yproxy.yaml:/data/yproxy.yaml
+    stop_grace_period: 60s
+    networks:
+      - greenplum
+
+networks:
+  greenplum:
+
+secrets:
+  gpdb_password:
+    file: ../docker-compose/secrets/gpdb_password
