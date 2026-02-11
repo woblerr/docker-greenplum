@@ -137,7 +137,7 @@ RUN wget ${GPDB_DOWNLOAD_URL}/${GPDB_VERSION}.tar.gz -O /tmp/gpdb-${GPDB_VERSION
     && cd /tmp/gpdb \
     && echo "${GPDB_VERSION} build dev" > /tmp/gpdb/VERSION \
     # Clone yezzey into gpcontrib before building GPDB
-    && git clone ${YEZZEY_DOWNLOAD_URL} gpcontrib/yezzey --depth 1 \
+    && git clone ${YEZZEY_DOWNLOAD_URL} gpcontrib/yezzey \
     && cd gpcontrib/yezzey \
     && git checkout ${YEZZEY_VERSION} \
     && cd /tmp/gpdb \
