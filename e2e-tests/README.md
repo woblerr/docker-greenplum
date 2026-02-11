@@ -104,6 +104,5 @@ cd [docker-greenplum-root]/e2e-tests
 cd e2e-tests
 docker compose -f docker-compose.s3.yml -f docker-compose.yezzey.yml up -d
 GREENPLUM_PASSWORD=$(cat ../docker-compose/secrets/gpdb_password) ./scripts/e2e-yezzey-test.sh
-docker compose -f -f docker-compose.s3.yml -f docker-compose.yezzey.yml down
-```
+docker compose -f docker-compose.s3.yml -f docker-compose.yezzey.yml down
 ```

@@ -14,7 +14,7 @@ This project provides Docker images for running Greenplum Database (GPDB) and it
 - Greenplum Database (GPDB)
 - [Greengage](https://github.com/GreengageDB/greengage) (GGDB)
 - [WarehousePG](https://github.com/warehouse-pg/warehouse-pg) (WHPG)
-- [open-gpdb](https://github.com/open-gpdb/gpdb)
+- [open-gpdb](https://github.com/open-gpdb/gpdb) (OpenGPDB)
 
 The Greenplum in docker provides the following features:
 - single-node deployment;
