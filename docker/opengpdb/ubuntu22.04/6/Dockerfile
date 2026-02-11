@@ -5,8 +5,8 @@ ARG GPXERCES_DOWNLOAD_URL="https://github.com/woblerr/gp-xerces/archive/refs/tag
 ARG GPXERCES_VERSION="v3.1.2-p1"
 ARG LIBSIGAR_DOWNLOAD_URL="https://github.com/boundary/sigar"
 ARG LIBSIGAR_COMMIT_HASH="e8961a6674cc4d292e61b353b5c36bfc345434cc"
-ARG GPDB_DOWNLOAD_URL="https://github.com/woblerr/gpdb/archive/refs/tags"
-ARG GPDB_VERSION="6.27.1"
+ARG GPDB_DOWNLOAD_URL="https://github.com/open-gpdb/gpdb/archive/refs/tags"
+ARG GPDB_VERSION="6.29.3"
 ARG DISKQUOTA_DOWNLOAD_URL="https://github.com/woblerr/diskquota/archive/refs/tags"
 ARG DISKQUOTA_VERSION="2.3.0"
 ARG PXF_DOWNLOAD_URL="https://github.com/woblerr/pxf/archive/refs/tags"
@@ -20,6 +20,11 @@ ARG GPBACKMAN_VERSION="v0.8.1"
 ARG WALG_DOWNLOAD_URL="https://github.com/wal-g/wal-g"
 # Wait new WAL-G release
 ARG WALG_VERSION="4b33c88939ce0cc23acc5f89dcf5e427c50923d9"
+ARG YPROXY_DOWNLOAD_URL="https://github.com/open-gpdb/yproxy/archive/refs/tags"
+ARG YPROXY_VERSION="1.7.2"
+ARG YEZZEY_DOWNLOAD_URL="https://github.com/open-gpdb/yezzey"
+# Wait new yezzey release
+ARG YEZZEY_VERSION="e32a6eb9bf711d23d80c1b6d9cf5c47a6778b0b5"
 
 FROM ubuntu:${UBUNTU_VERSION} AS builder
 
@@ -31,6 +36,10 @@ ARG GPDB_DOWNLOAD_URL
 ARG GPDB_VERSION
 ARG DISKQUOTA_DOWNLOAD_URL
 ARG DISKQUOTA_VERSION
+ARG YEZZEY_DOWNLOAD_URL
+ARG YEZZEY_VERSION
+ARG YPROXY_DOWNLOAD_URL
+ARG YPROXY_VERSION
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -78,6 +87,9 @@ RUN apt-get update \
         openjdk-11-jdk \
         libbrotli-dev \
         libsodium-dev \
+        libprotobuf-c-dev \
+        protobuf-c-compiler \
+        libgpgme-dev \
     && apt-get autoremove -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
@@ -124,6 +136,14 @@ RUN wget ${GPDB_DOWNLOAD_URL}/${GPDB_VERSION}.tar.gz -O /tmp/gpdb-${GPDB_VERSION
     && tar -xzf /tmp/gpdb-${GPDB_VERSION}.tar.gz --strip-components=1 -C /tmp/gpdb \
     && cd /tmp/gpdb \
     && echo "${GPDB_VERSION} build dev" > /tmp/gpdb/VERSION \
+    # Clone yezzey into gpcontrib before building GPDB
+    && git clone ${YEZZEY_DOWNLOAD_URL} gpcontrib/yezzey \
+    && cd gpcontrib/yezzey \
+    && git checkout ${YEZZEY_VERSION} \
+    && cd /tmp/gpdb \
+    # Remove 'trusted' parameter from control file for compatibility
+    # This prevents potential security issues with untrusted extension loading
+    && sed -i '/^trusted/d' gpcontrib/yezzey/yezzey.control \
     && ./configure --prefix=/usr/local/greenplum-db \
         --enable-ic-proxy \
         --enable-gpperfmon \
@@ -136,6 +156,9 @@ RUN wget ${GPDB_DOWNLOAD_URL}/${GPDB_VERSION}.tar.gz -O /tmp/gpdb-${GPDB_VERSION
         --with-gssapi \
         --with-pythonsrc-ext \
         --with-uuid=e2fs \
+        # See https://github.com/open-gpdb/gpdb/commit/654c51834f820c716f41999751a7cb242bd66775
+        # and https://yandex.cloud/en/docs/managed-postgresql/tutorials/glibc-collation-issues
+        --without-mdblocales \
     && make -j2 \
     && make install \
     && rm -rf \
@@ -143,9 +166,15 @@ RUN wget ${GPDB_DOWNLOAD_URL}/${GPDB_VERSION}.tar.gz -O /tmp/gpdb-${GPDB_VERSION
         /tmp/gpdb-${GPDB_VERSION}.tar.gz
 
 # diskquota
+# Patched for compatibility with Open GPDB 6.29.3
+# The GetUserNameFromId function signature changed in commit:
+# https://github.com/open-gpdb/gpdb/commit/5cbe6b50acb061a7f1b661f8e344d5bcd3518b4d
+# Added 'bool noerr' parameter for new regrole type support
 RUN wget ${DISKQUOTA_DOWNLOAD_URL}/${DISKQUOTA_VERSION}.tar.gz -O /tmp/diskquota-${DISKQUOTA_VERSION}.tar.gz \
     && mkdir -p /tmp/diskquota \
     && tar -xzf /tmp/diskquota-${DISKQUOTA_VERSION}.tar.gz --strip-components=1 -C /tmp/diskquota \
+    # Patch quotamodel.c for Open GPDB 6.29.3
+    && sed -i 's/GetUserNameFromId(relowner)/GetUserNameFromId(relowner, false)/g' /tmp/diskquota/src/quotamodel.c \
     && mkdir -p /tmp/diskquota/build \
     && cd /tmp/diskquota/build \
     && cmake /tmp/diskquota \
@@ -169,6 +198,8 @@ ARG PXF_DOWNLOAD_URL
 ARG PXF_VERSION
 ARG WALG_DOWNLOAD_URL
 ARG WALG_VERSION
+ARG YPROXY_DOWNLOAD_URL
+ARG YPROXY_VERSION
 
 RUN mkdir -p /opt/go \
     && wget https://go.dev/dl/go${GOLANG_VERSION}.linux-$(dpkg --print-architecture).tar.gz \
@@ -212,6 +243,13 @@ RUN git clone ${WALG_DOWNLOAD_URL} /tmp/wal-g \
        USE_LIBSODIUM=1 \
        make gp_build
 
+# yproxy
+RUN wget ${YPROXY_DOWNLOAD_URL}/${YPROXY_VERSION}.tar.gz -O /tmp/yproxy-${YPROXY_VERSION}.tar.gz \
+    && mkdir -p /tmp/yproxy \
+    && tar -xzf /tmp/yproxy-${YPROXY_VERSION}.tar.gz --strip-components=1 -C /tmp/yproxy \
+    && cd /tmp/yproxy \
+    && make build
+
 # pxf
 # Build pxf without tests
 # Components: external-table, cli, server
@@ -250,7 +288,8 @@ ENV TZ="Etc/UTC" \
     GREENPLUM_GPPERFMON_ENABLE="false" \
     GREENPLUM_DISKQUOTA_ENABLE="false" \
     GREENPLUM_PXF_ENABLE="false" \
-    GREENPLUM_WALG_ENABLE="false"
+    GREENPLUM_WALG_ENABLE="false" \
+    GREENPLUM_YEZZEY_ENABLE="false"
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -340,9 +379,11 @@ COPY --from=go_builder \
 COPY --from=go_builder /opt/go/bin/gpbackup_s3_plugin /usr/local/greenplum-db/bin/gpbackup_s3_plugin
 COPY --from=go_builder /usr/local/pxf /usr/local/pxf
 COPY --from=go_builder /tmp/gpbackman/gpbackman /usr/local/greenplum-db/bin/gpbackman
+COPY --from=go_builder /tmp/yproxy/devbin/yproxy /usr/local/greenplum-db/bin/yproxy
+COPY --from=go_builder /tmp/yproxy/devbin/yp-client /usr/local/greenplum-db/bin/yp-client
 COPY --from=go_builder /tmp/wal-g/main/gp/wal-g /usr/local/greenplum-db/bin/wal-g
 COPY --chmod=755 docker/files/entrypoint.sh /entrypoint.sh
-COPY --chmod=755 docker/files/start_gpdb.sh /start_gpdb.sh
+COPY --chmod=755 docker/files/opengpdb/start_gpdb.sh /start_gpdb.sh
 
 LABEL \
     org.opencontainers.image.version="${REPO_BUILD_TAG}" \

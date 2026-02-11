@@ -6,6 +6,7 @@
 [![build-greengage7](https://github.com/woblerr/docker-greenplum/actions/workflows/build-greengage7.yml/badge.svg)](https://github.com/woblerr/docker-greenplum/actions/workflows/build-greengage7.yml)
 [![build-warehousepg6](https://github.com/woblerr/docker-greenplum/actions/workflows/build-warehousepg6.yml/badge.svg)](https://github.com/woblerr/docker-greenplum/actions/workflows/build-warehousepg6.yml)
 [![build-warehousepg7](https://github.com/woblerr/docker-greenplum/actions/workflows/build-warehousepg7.yml/badge.svg)](https://github.com/woblerr/docker-greenplum/actions/workflows/build-warehousepg7.yml)
+[![build-opengpdb6](https://github.com/woblerr/docker-greenplum/actions/workflows/build-opengpdb6.yml/badge.svg)](https://github.com/woblerr/docker-greenplum/actions/workflows/build-opengpdb6.yml)
 
 This project provides Docker images for running Greenplum Database (GPDB) and its forks in containers. It supports both single-node and multi-node deployments. The images can be used for development, testing, and learning purposes.
 
@@ -13,6 +14,7 @@ This project provides Docker images for running Greenplum Database (GPDB) and it
 - Greenplum Database (GPDB)
 - [Greengage](https://github.com/GreengageDB/greengage) (GGDB)
 - [WarehousePG](https://github.com/warehouse-pg/warehouse-pg) (WHPG)
+- [open-gpdb](https://github.com/open-gpdb/gpdb) (OpenGPDB)
 
 The Greenplum in docker provides the following features:
 - single-node deployment;
@@ -26,6 +28,10 @@ The Greenplum in docker provides the following features:
 - PXF (Platform Extension Framework);
 - custom initialization scripts;
 - WAL-G (physical backups).
+
+The open-gpdb image contains additional features:
+- Yezzey and Yproxy for data offloading to S3.
+
 
 Environment variables supported by this image:
 
@@ -47,39 +53,48 @@ Required environment variables:
 * `GREENPLUM_PASSWORD` - password for `${GREENPLUM_USER}` user, **required**;
 * `GREENPLUM_GPMON_PASSWORD` - password for `gpmon` user, **required** when `GREENPLUM_GPPERFMON_ENABLE` is `true`;
 
+The open-gpdb image support additional environment variables for Yezzey and Yproxy features:
+
+* `GREENPLUM_YEZZEY_ENABLE` - enable Yezzey extension and start Yproxy service for data offloading to S3, default `false`;
+
 ## Build matrix
 
 The repository contains information for the last available versions. For specific version, you can build your own image using the [Build](#build) section.
 
 Greenplum 6:
-| GPDB Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
-|---|---|---| ---|
-| 6.27.1| `6.27.1`, `6.27.1-ubuntu22.04` | `6.27.1-oraclelinux8` | `linux/amd64`, `linux/arm64` |
+| Image | GPDB Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
+|---|---|---|---| ---|
+| greenplum | 6.27.1| `6.27.1`, `6.27.1-ubuntu22.04` | `6.27.1-oraclelinux8` | `linux/amd64`, `linux/arm64` |
 
 Greenplum 7:
-| GPDB Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
-|---|---|---| ---|
-| 7.1.0| `7.1.0`, `7.1.0-ubuntu22.04` | `7.1.0-oraclelinux8` |  `linux/amd64`, `linux/arm64` |
+| Image | GPDB Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
+|---|---|---|---| ---|
+| greenplum | 7.1.0| `7.1.0`, `7.1.0-ubuntu22.04` | `7.1.0-oraclelinux8` |  `linux/amd64`, `linux/arm64` |
 
 Greengage 6:
-| Greengage Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
-|---|---|---| ---|
-| 6.29.2| `6.29.2`, `6.29.2-ubuntu22.04` | `6.29.2-oraclelinux8` | `linux/amd64`, `linux/arm64` |
+| Image | Greengage Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
+|---|---|---|---| ---|
+| greengage | 6.29.2| `6.29.2`, `6.29.2-ubuntu22.04` | `6.29.2-oraclelinux8` | `linux/amd64`, `linux/arm64` |
 
 Greengage 7:
-| Greengage Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
-|---|---|---| ---|
-| 7.4.1| `7.4.1`, `7.4.1-ubuntu22.04` | `7.4.1-oraclelinux8` | `linux/amd64`, `linux/arm64` |
+| Image | Greengage Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
+|---|---|---|---| ---|
+| greengage | 7.4.1| `7.4.1`, `7.4.1-ubuntu22.04` | `7.4.1-oraclelinux8` | `linux/amd64`, `linux/arm64` |
 
 WarehousePG 6:
-| WarehousePG Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
-|---|---|---| ---|
-| 6.27.2-WHPG| `6.27.2-WHPG`, `6.27.2-WHPG-ubuntu22.04` | `6.27.2-WHPG-oraclelinux8` | `linux/amd64`, `linux/arm64` |
+| Image | WarehousePG Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
+|---|---|---|---| ---|
+| warehousepg | 6.27.2-WHPG| `6.27.2-WHPG`, `6.27.2-WHPG-ubuntu22.04` | `6.27.2-WHPG-oraclelinux8` | `linux/amd64`, `linux/arm64` |
 
 WarehousePG 7:
-| WarehousePG Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
-|---|---|---| ---|
-| 7.3.0-WHPG| `7.3.0-WHPG`, `7.3.0-WHPG-ubuntu22.04` | `7.3.0-WHPG-oraclelinux8` | `linux/amd64`, `linux/arm64` |
+| Image | WarehousePG Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
+|---|---|---|---| ---|
+| warehousepg | 7.3.0-WHPG| `7.3.0-WHPG`, `7.3.0-WHPG-ubuntu22.04` | `7.3.0-WHPG-oraclelinux8` | `linux/amd64`, `linux/arm64` |
+
+open-gpdb 6:
+| Image | open-gpdb Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
+|---|---|---|---| ---|
+| opengpdb | 6.29.3| `6.29.3`, `6.29.3-ubuntu22.04` | - | `linux/amd64`, `linux/arm64` |
 
 ## Pull
 Change `tag` to the version you need.
@@ -124,6 +139,21 @@ docker pull woblerr/warehousepg:tag
 
 ```bash
 docker pull ghcr.io/woblerr/warehousepg:tag
+```
+
+
+**open-gpdb:**
+
+* Docker Hub:
+
+```bash
+docker pull woblerr/opengpdb:tag
+```
+
+* GitHub Registry:
+
+```bash
+docker pull ghcr.io/woblerr/opengpdb:tag
 ```
 
 ## Run
@@ -228,6 +258,25 @@ USER=${GREENPLUM_USER} gpconfig -c archive_timeout -v 600 --skipvalidation
 USER=${GREENPLUM_USER} gpstop -u
 ```
 
+#### Yezzey configuration
+
+**Note:** Yezzey is only available for open-gpdb image.
+
+When `GREENPLUM_YEZZEY_ENABLE=true`:
+- Yezzey extension is automatically configured and enabled
+- Yproxy service starts automatically
+- Requires `yproxy.yaml` configuration file mounted at `/data/yproxy.yaml` inside the container.
+
+Quick example:
+
+```bash
+docker run -p 5432:5432 \
+  -e GREENPLUM_PASSWORD=gparray \
+  -e GREENPLUM_YEZZEY_ENABLE=true \
+  -v $(pwd)/yproxy.yaml:/data/yproxy.yaml \
+  -d opengpdb:6.29.3
+```
+
 ### Docker Compose
 #### Prepare
 
@@ -329,6 +378,13 @@ make build_warehousepg_6_oraclelinux TAG_WAREHOUSEPG_6=6.27.2-WHPG
 make build_warehousepg_7_oraclelinux TAG_WAREHOUSEPG_7=7.3.0-WHPG
 ```
 
+**open-gpdb:**
+
+For Ubuntu based images:
+```bash
+make build_opengpdb_6_ubuntu TAG_OPENGPDB_6=6.29.3
+```
+
 **Manual build examples:**
 
 Greenplum simple manual build:
@@ -366,6 +422,11 @@ docker buildx build -f docker/warehousepg/oraclelinux8/6/Dockerfile -t warehouse
 ```
 ```bash
 docker buildx build -f docker/warehousepg/oraclelinux8/7/Dockerfile -t warehousepg:7.3.0-WHPG-oraclelinux8 .
+```
+
+open-gpdb simple manual build:
+```bash
+docker buildx build -f docker/opengpdb/ubuntu22.04/6/Dockerfile -t opengpdb:6.29.3 .
 ```
 
 Manual build with specific component version for `linux/amd64` platform:

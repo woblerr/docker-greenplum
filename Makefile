@@ -10,6 +10,8 @@ WAREHOUSEPG_6_VERSIONS = 6.27.2-WHPG
 TAG_WAREHOUSEPG_6 ?= 6.27.2-WHPG
 WAREHOUSEPG_7_VERSIONS = 7.3.0-WHPG
 TAG_WAREHOUSEPG_7 ?= 7.3.0-WHPG
+OPENGPDB_6_VERSIONS = 6.29.3
+TAG_OPENGPDB_6 ?= 6.29.3
 UBUNTU_OS_VERSION = ubuntu22.04
 OL_OS_VERSION = oraclelinux8
 UID := $(shell id -u)
@@ -73,6 +75,10 @@ build_warehousepg_7_ubuntu:
 build_warehousepg_7_oraclelinux:
 	$(call build_warehousepg_image_with_tag,7,$(TAG_WAREHOUSEPG_7),$(OL_OS_VERSION))
 
+.PHONY: build_opengpdb_6_ubuntu
+build_opengpdb_6_ubuntu:
+	$(call build_opengpdb_image_with_tag,6,$(TAG_OPENGPDB_6),$(UBUNTU_OS_VERSION))
+
 .PHONY: test-e2e
 test-e2e:
 	$(MAKE) -C e2e-tests test-e2e
@@ -81,6 +87,9 @@ test-e2e:
 test-e2e-walg:
 	$(MAKE) -C e2e-tests test-e2e-walg
 
+.PHONY: test-e2e-yezzey
+test-e2e-yezzey:
+	$(MAKE) -C e2e-tests test-e2e-yezzey
 
 define build_image
 	@echo "Build GPDB $(1):$(2) $(3) docker image"
@@ -100,4 +109,9 @@ endef
 define build_warehousepg_image_with_tag
 	@echo "Build WarehousePG $(1):$(2) $(3) docker image"
 	docker buildx build -f docker/warehousepg/$(3)/$(1)/Dockerfile --build-arg GPDB_VERSION=$(2) -t warehousepg:$(2)-$(3) .
+endef
+
+define build_opengpdb_image_with_tag
+	@echo "Build OpenGPDB $(1):$(2) $(3) docker image"
+	docker buildx build -f docker/opengpdb/$(3)/$(1)/Dockerfile --build-arg GPDB_VERSION=$(2) -t opengpdb:$(2)-$(3) .
 endef

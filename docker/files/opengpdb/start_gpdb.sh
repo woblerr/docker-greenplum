@@ -105,6 +105,11 @@ is_gpperfmon_enabled() {
        "${GREENPLUM_DEPLOYMENT}" == "master" ]]
 }
 
+is_yproxy_enabled() {
+    # Yproxy is required when Yezzey is enabled
+    [[ "${GREENPLUM_YEZZEY_ENABLE}" == "true" ]]
+}
+
 check_required_var() {
     local var_name=$1
     local var_value=$2
@@ -180,9 +185,68 @@ execute_custom_init_scripts() {
     fi
 }
 
+setup_yproxy_config() {
+    local yproxy_config="${GREENPLUM_DATA_DIRECTORY}/yproxy.yaml"
+    local yproxy_socket="/tmp/yproxy.sock"
+    if [ ! -f "${yproxy_config}" ]; then
+        error_and_exit "yproxy config not found at ${yproxy_config}. Please mount your yproxy.yaml configuration file to ${yproxy_config}"
+    fi
+    echo "INFO - Using yproxy config at ${yproxy_config}"
+    export YPROXY_CONFIG="${yproxy_config}"
+    export YPROXY_SOCKET="${yproxy_socket}"
+}
+
+start_yproxy() {
+    # Check if yproxy command is available
+    if ! command -v yproxy &> /dev/null; then
+        error_and_exit "yproxy command not found. This feature is only available in OpenGPDB images."
+    fi
+    local yproxy_config="${YPROXY_CONFIG}"
+    local yproxy_socket="${YPROXY_SOCKET}"
+    if [ -S "${yproxy_socket}" ]; then
+        echo "INFO - yproxy socket already exists at ${yproxy_socket}, checking if service is running"
+        if nc -U -z "${yproxy_socket}" 2>/dev/null; then
+            echo "INFO - yproxy is already running"
+            return 0
+        else
+            echo "INFO - Removing stale socket ${yproxy_socket}"
+            rm -f "${yproxy_socket}"
+        fi
+    fi
+    echo "INFO - Starting yproxy with config ${yproxy_config}"
+    yproxy --config "${yproxy_config}" >> "${GREENPLUM_DATA_DIRECTORY}/yproxy.log" 2>&1 &
+    local yproxy_pid=$!
+    # Wait for socket to be created (max 30 seconds)
+    local wait_time=0
+    while [ ! -S "${yproxy_socket}" ] && [ ${wait_time} -lt 30 ]; do
+        sleep 1
+        wait_time=$((wait_time + 1))
+    done
+    if [ -S "${yproxy_socket}" ]; then
+        echo "INFO - yproxy started successfully (PID: ${yproxy_pid})"
+        echo "${yproxy_pid}" > "${GREENPLUM_DATA_DIRECTORY}/yproxy.pid"
+    else
+        error_and_exit "Failed to start yproxy, socket not created"
+    fi
+}
+
+stop_yproxy() {
+    local yproxy_pid_file="${GREENPLUM_DATA_DIRECTORY}/yproxy.pid"
+    if [ -f "${yproxy_pid_file}" ]; then
+        local yproxy_pid=$(cat "${yproxy_pid_file}")
+        if kill -0 "${yproxy_pid}" 2>/dev/null; then
+            echo "INFO - Stopping yproxy (PID: ${yproxy_pid})"
+            kill "${yproxy_pid}"
+            rm -f "${yproxy_pid_file}"
+        fi
+    fi
+    rm -f "${YPROXY_SOCKET}"
+}
+
 initialize_and_start_gpdb_segments() {
     local end_flag=""
     local arg segment_num segment_type
+    source "/home/${GREENPLUM_USER}/.bashrc"
     echo "INFO - Initializing segment host"
     if [ $# -eq 0 ]; then
         error_and_exit "No segment specifications provided"
@@ -194,7 +258,16 @@ initialize_and_start_gpdb_segments() {
         IFS=':' read -r segment_num segment_type <<< "$arg"
         setup_segments "${segment_num}" "${segment_type}"
     done
-    trap "echo 'INFO - Shutdown segment host' && end_flag=1" TERM INT
+    # Start yproxy if enabled
+    if is_yproxy_enabled; then
+        setup_yproxy_config
+        start_yproxy
+    fi
+    trap "if is_yproxy_enabled; then \
+            echo 'INFO - Stop yproxy'; \
+            stop_yproxy; \
+        fi; \
+        echo 'INFO - Shutdown segment host' && end_flag=1" TERM INT
     # Keep container running
     while [ "${end_flag}" == '' ]; do
         sleep 1
@@ -286,6 +359,31 @@ initialize_and_start_gpdb() {
                 USER=${GREENPLUM_USER} gpconfig -c wal_level -v replica --skipvalidation
             fi
         fi
+        if [ "${GREENPLUM_YEZZEY_ENABLE}" == "true" ]; then
+            echo "INFO - Enable yezzey"
+            # Check if yezzey extension is available
+            if ! psql template1 -t -c "SELECT 1 FROM pg_available_extensions WHERE name = 'yezzey'" 2>/dev/null | grep -q 1; then
+                error_and_exit "yezzey extension not available. This feature is only available in OpenGPDB images."
+            fi
+            # Get current shared_preload_libraries value
+            echo "INFO - psql template1 -t -c \"SHOW shared_preload_libraries\" | xargs"
+            gp_shared_preload_libraries=$(psql template1 -t -c "SHOW shared_preload_libraries" | xargs)
+            # Configure yezzey parameters
+            # Disable GPG encryption for data offloaded to S3
+            echo "INFO - gpconfig -c yezzey.use_gpg_crypto -v \"false\""
+            USER=${GREENPLUM_USER} gpconfig -c yezzey.use_gpg_crypto -v "false"
+            # Enable OTM (Offload Table Metadata) to track offloaded table segments
+            echo "INFO - gpconfig -c yezzey.use_otm_feature -v \"true\""
+            USER=${GREENPLUM_USER} gpconfig -c yezzey.use_otm_feature -v "true"
+            # Add yezzey to shared_preload_libraries
+            if [ -z "${gp_shared_preload_libraries}" ]; then
+                echo "INFO - gpconfig -c shared_preload_libraries -v \"yezzey\""
+                USER=${GREENPLUM_USER} gpconfig -c shared_preload_libraries -v "yezzey"
+            else
+                echo "INFO - gpconfig -c shared_preload_libraries -v \"'$gp_shared_preload_libraries,yezzey'\""
+                USER=${GREENPLUM_USER} gpconfig -c shared_preload_libraries -v "'$gp_shared_preload_libraries,yezzey'"
+            fi
+        fi
         # Configure pg_hba
         echo "INFO - Configure pg_hba.conf"
         {
@@ -302,6 +400,15 @@ initialize_and_start_gpdb() {
         psql ${GREENPLUM_DATABASE_NAME} -t -c "CREATE EXTENSION IF NOT EXISTS diskquota;" | xargs
         echo "INFO - psql ${GREENPLUM_DATABASE_NAME} -t -c \"SELECT diskquota.init_table_size_table();\" | xargs"
         psql ${GREENPLUM_DATABASE_NAME} -t -c "SELECT diskquota.init_table_size_table();" | xargs
+    fi
+    # If db name is set and yezzey is enabled, create extension
+    if [ "${GREENPLUM_YEZZEY_ENABLE}" == "true" ] && [ -n "${GREENPLUM_DATABASE_NAME:-}" ]; then
+        # Check if yezzey extension is available
+        if ! psql template1 -t -c "SELECT 1 FROM pg_available_extensions WHERE name = 'yezzey'" 2>/dev/null | grep -q 1; then
+            error_and_exit "yezzey extension not available. This feature is only available in OpenGPDB images."
+        fi
+        echo "INFO - psql ${GREENPLUM_DATABASE_NAME} -t -c \"CREATE EXTENSION IF NOT EXISTS yezzey;\" | xargs"
+        psql ${GREENPLUM_DATABASE_NAME} -t -c "CREATE EXTENSION IF NOT EXISTS yezzey;" | xargs
     fi
     # Enable PXF
     if [ ${GREENPLUM_PXF_ENABLE} == "true" ]; then
@@ -321,11 +428,20 @@ initialize_and_start_gpdb() {
         pxf cluster start
         sleep 10
     fi
+    # Start yproxy if enabled
+    if is_yproxy_enabled; then
+        setup_yproxy_config
+        start_yproxy
+    fi
     # Monitor logs
     trap "kill %1; \
         if [ ${GREENPLUM_PXF_ENABLE} == 'true' ] && [ -f '${pxf_env}' ]; then \
             echo 'INFO - Stop PXF cluster'; \
             pxf cluster stop; \
+        fi; \
+        if is_yproxy_enabled; then \
+            echo 'INFO - Stop yproxy'; \
+            stop_yproxy; \
         fi; \
         gpstop -a -M fast && end_flag=1" INT TERM
     tail -f $(ls ${GREENPLUM_DATA_DIRECTORY}/${gp_master_dir_name}/${GREENPLUM_SEG_PREFIX}-1/${gp_log_dir}/gpdb-* | tail -n1) &
