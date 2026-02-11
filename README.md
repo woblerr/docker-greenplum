@@ -84,7 +84,7 @@ Greengage 7:
 WarehousePG 6:
 | Image | WarehousePG Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
 |---|---|---|---| ---|
-| warehousepg | 6.27.2-WHPG| `6.27.2-WHPG`, `6.27.2-WHPG-ubuntu22.04` | `6.27.2-WHPG-oraclelinux8` | `linux/amd64`, `linux/arm64` |
+| warehousepg | 6.27.3-WHPG| `6.27.3-WHPG`, `6.27.3-WHPG-ubuntu22.04` | `6.27.3-WHPG-oraclelinux8` | `linux/amd64`, `linux/arm64` |
 
 WarehousePG 7:
 | Image | WarehousePG Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
@@ -364,7 +364,7 @@ make build_greengage_7_oraclelinux TAG_GREENGAGE_7=7.4.1
 
 For Ubuntu based images:
 ```bash
-make build_warehousepg_6_ubuntu TAG_WAREHOUSEPG_6=6.27.2-WHPG
+make build_warehousepg_6_ubuntu TAG_WAREHOUSEPG_6=6.27.3-WHPG
 ```
 ```bash
 make build_warehousepg_7_ubuntu TAG_WAREHOUSEPG_7=7.3.0-WHPG
@@ -372,7 +372,7 @@ make build_warehousepg_7_ubuntu TAG_WAREHOUSEPG_7=7.3.0-WHPG
 
 For Oracle Linux based images:
 ```bash
-make build_warehousepg_6_oraclelinux TAG_WAREHOUSEPG_6=6.27.2-WHPG
+make build_warehousepg_6_oraclelinux TAG_WAREHOUSEPG_6=6.27.3-WHPG
 ```
 ```bash
 make build_warehousepg_7_oraclelinux TAG_WAREHOUSEPG_7=7.3.0-WHPG
@@ -410,7 +410,7 @@ docker buildx build -f docker/greengage/oraclelinux8/7/Dockerfile -t greengage:7
 
 WarehousePG simple manual build:
 ```bash
-docker buildx build -f docker/warehousepg/ubuntu22.04/6/Dockerfile -t warehousepg:6.27.2-WHPG .
+docker buildx build -f docker/warehousepg/ubuntu22.04/6/Dockerfile -t warehousepg:6.27.3-WHPG .
 ```
 ```bash
 docker buildx build -f docker/warehousepg/ubuntu22.04/7/Dockerfile -t warehousepg:7.3.0-WHPG .
@@ -418,7 +418,7 @@ docker buildx build -f docker/warehousepg/ubuntu22.04/7/Dockerfile -t warehousep
 
 WarehousePG OracleLinux manual build:
 ```bash
-docker buildx build -f docker/warehousepg/oraclelinux8/6/Dockerfile -t warehousepg:6.27.2-WHPG-oraclelinux8 .
+docker buildx build -f docker/warehousepg/oraclelinux8/6/Dockerfile -t warehousepg:6.27.3-WHPG-oraclelinux8 .
 ```
 ```bash
 docker buildx build -f docker/warehousepg/oraclelinux8/7/Dockerfile -t warehousepg:7.3.0-WHPG-oraclelinux8 .
