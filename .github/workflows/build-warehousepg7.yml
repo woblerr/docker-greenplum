@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-22.04-arm' || 'ubuntu-22.04' }}
     strategy:
       matrix:
-        warehousepg_version: ["7.3.0-WHPG"]
+        warehousepg_version: ["7.3.1-WHPG"]
         os_version: ["ubuntu22.04", "oraclelinux8"]
         platform: ["linux/amd64", "linux/arm64"]
     steps:
@@ -87,7 +87,7 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     strategy:
       matrix:
-        warehousepg_version: ["7.3.0-WHPG"]
+        warehousepg_version: ["7.3.1-WHPG"]
         os_version: ["ubuntu22.04", "oraclelinux8"]
     steps:
       - name: Get repo tag
