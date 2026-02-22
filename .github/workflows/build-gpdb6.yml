@@ -16,6 +16,7 @@ jobs:
 
       - name: Detect changed files
         id: changed-files
+        # tj-actions/changed-files@v47.0.4
         uses: tj-actions/changed-files@7dee1b0c1557f278e5c7dc244927139d78c0e22a
         with:
           files_yaml: |
@@ -25,6 +26,17 @@ jobs:
               - 'docker/files/entrypoint.sh'
               - 'docker/files/start_gpdb.sh'
               - '.github/workflows/build-gpdb6.yml'
+
+      - name: Log build trigger reason
+        run: |
+          if [[ "${{ steps.changed-files.outputs.project_any_changed }}" == "true" || \
+               "${{ steps.changed-files.outputs.common_any_changed }}" == "true" || \
+               "${{ github.ref }}" == "refs/heads/master" || \
+               "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "build_image will run"
+          else
+            echo "build_image will be skipped"
+          fi
 
   build_image:
     needs: [detect_changes]
