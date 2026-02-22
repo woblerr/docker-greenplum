@@ -3,7 +3,48 @@ name: build-gpdb7
 on: [push, pull_request]
 
 jobs:
+  detect_changes:
+    runs-on: ubuntu-22.04
+    outputs:
+      project_changed: ${{ steps.changed-files.outputs.project_any_changed }}
+      common_changed: ${{ steps.changed-files.outputs.common_any_changed }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed files
+        id: changed-files
+        # tj-actions/changed-files@v47.0.4
+        uses: tj-actions/changed-files@7dee1b0c1557f278e5c7dc244927139d78c0e22a
+        with:
+          files_yaml: |
+            project:
+              - 'docker/greenplum/**/7/**'
+            common:
+              - 'docker/files/entrypoint.sh'
+              - 'docker/files/start_gpdb.sh'
+              - '.github/workflows/build-gpdb7.yml'
+
+      - name: Log build trigger reason
+        run: |
+          if [[ "${{ steps.changed-files.outputs.project_any_changed }}" == "true" || \
+               "${{ steps.changed-files.outputs.common_any_changed }}" == "true" || \
+               "${{ github.ref }}" == "refs/heads/master" || \
+               "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "build_image will run"
+          else
+            echo "build_image will be skipped"
+          fi
+
   build_image:
+    needs: [detect_changes]
+    if: |
+      needs.detect_changes.outputs.project_changed == 'true' ||
+      needs.detect_changes.outputs.common_changed == 'true' ||
+      github.ref == 'refs/heads/master' ||
+      startsWith(github.ref, 'refs/tags/')
     # Use native ARM64 runners for arm64 platform, standard x64 runners for amd64
     runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-22.04-arm' || 'ubuntu-22.04' }}
     strategy:
