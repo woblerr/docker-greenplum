@@ -16,6 +16,8 @@ This project provides Docker images for running Greenplum Database (GPDB) and it
 - [WarehousePG](https://github.com/warehouse-pg/warehouse-pg) (WHPG)
 - [open-gpdb](https://github.com/open-gpdb/gpdb) (OpenGPDB)
 
+For [Apache Cloudberry](https://cloudberry.apache.org/) Docker images, see the [docker-cloudberry](https://github.com/woblerr/docker-cloudberry) repository.
+
 The Greenplum in docker provides the following features:
 - single-node deployment;
 - master and segments deployment;
