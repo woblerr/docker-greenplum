@@ -16,8 +16,8 @@ ARG UBUNTU_VERSION="22.04"
 ARG GOLANG_VERSION="1.24.11"
 ARG LIBSIGAR_DOWNLOAD_URL="https://github.com/boundary/sigar"
 ARG LIBSIGAR_COMMIT_HASH="e8961a6674cc4d292e61b353b5c36bfc345434cc"
-ARG GPDB_DOWNLOAD_URL="https://github.com/GreengageDB/greengage/archive/refs/tags"
-ARG GPDB_VERSION="6.29.2"
+ARG GPDB_REPO_URL="https://github.com/GreengageDB/greengage.git"
+ARG GPDB_VERSION="6.30.1"
 # There is no fresh release of diskquota in GreengageDB repo, use Arenadata's fork
 # When new release will be available, switch to GreengageDB repo
 ARG DISKQUOTA_DOWNLOAD_URL="https://github.com/arenadata/diskquota/archive/refs/tags"
@@ -34,7 +34,7 @@ ARG GPBACKMAN_DOWNLOAD_URL="https://github.com/woblerr/gpbackman/archive/refs/ta
 ARG GPBACKMAN_VERSION="v0.8.1"
 # Greengage use pgBackRest fork for physical backups.
 # It is not clear whether wal-g will work correctly.
-# Will be error like: "unknown flavor: PostgreSQL 9.4.26 (Greengage Database 6.29.2 build dev)"
+# Will be error like: "unknown flavor: PostgreSQL 9.4.26 (Greengage Database 6.30.1 build dev)"
 #ARG WALG_DOWNLOAD_URL="https://github.com/wal-g/wal-g"
 ## Wait new WAL-G release
 #ARG WALG_VERSION="4b33c88939ce0cc23acc5f89dcf5e427c50923d9"
@@ -43,7 +43,7 @@ FROM ubuntu:${UBUNTU_VERSION} AS builder
 
 ARG LIBSIGAR_DOWNLOAD_URL
 ARG LIBSIGAR_COMMIT_HASH
-ARG GPDB_DOWNLOAD_URL
+ARG GPDB_REPO_URL
 ARG GPDB_VERSION
 ARG DISKQUOTA_DOWNLOAD_URL
 ARG DISKQUOTA_VERSION
@@ -108,6 +108,7 @@ RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output /tmp/get-pip.py \
         conan==1.48.2 \
         psutil==5.9.6 \
         setuptools==36.6.0 \
+        future==1.0.0 \
     && ln -s /usr/bin/python2.7 /usr/bin/python \
     && rm -rf /tmp/get-pip.py
 
@@ -123,9 +124,8 @@ RUN git clone ${LIBSIGAR_DOWNLOAD_URL} /tmp/sigar \
     && rm -rf /tmp/sigar
 
 # greengage
-RUN wget ${GPDB_DOWNLOAD_URL}/${GPDB_VERSION}.tar.gz -O /tmp/gpdb-${GPDB_VERSION}.tar.gz \
-    && mkdir -p /tmp/gpdb \
-    && tar -xzf /tmp/gpdb-${GPDB_VERSION}.tar.gz --strip-components=1 -C /tmp/gpdb \
+# Use git clone with --recurse-submodules to include PyGreSQL and other submodules
+RUN git clone --depth 1 --branch ${GPDB_VERSION} --recurse-submodules ${GPDB_REPO_URL} /tmp/gpdb \
     && cd /tmp/gpdb \
     && echo "${GPDB_VERSION} build dev" > /tmp/gpdb/VERSION \
     && ./configure --prefix=/usr/local/greenplum-db \
@@ -147,9 +147,7 @@ RUN wget ${GPDB_DOWNLOAD_URL}/${GPDB_VERSION}.tar.gz -O /tmp/gpdb-${GPDB_VERSION
     # greenplum_path.sh was renamed to greengage_path.sh
     # For now, it's enough to create a symlink for compatibility
     && ln -s /usr/local/greenplum-db/greengage_path.sh /usr/local/greenplum-db/greenplum_path.sh \
-    && rm -rf \
-        /tmp/gpdb \
-        /tmp/gpdb-${GPDB_VERSION}.tar.gz
+    && rm -rf /tmp/gpdb
 
 # diskquota
 RUN wget ${DISKQUOTA_DOWNLOAD_URL}/${DISKQUOTA_VERSION}.tar.gz -O /tmp/diskquota-${DISKQUOTA_VERSION}.tar.gz \
