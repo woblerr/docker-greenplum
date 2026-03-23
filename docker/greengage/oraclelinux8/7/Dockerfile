@@ -29,7 +29,7 @@ ARG DISKQUOTA_VERSION="2.3.0_arenadata9"
 ARG PXF_DOWNLOAD_URL="https://github.com/GreengageDB/pxf/archive/refs/tags"
 ARG PXF_VERSION="6.14.1"
 ARG GPBACKUP_DOWNLOAD_URL="https://github.com/GreengageDB/gpbackup/archive/refs/tags"
-ARG GPBACKUP_VERSION="1.31.0"
+ARG GPBACKUP_VERSION="1.31.1"
 # There is no fresh release of gpbackup-s3-plugin in GreengageDB repo
 # When new release will be available, switch to GreengageDB repo
 ARG GPBACKUP_S3_PLUGIN_DOWNLOAD_URL="https://github.com/woblerr/gpbackup-s3-plugin/archive/refs/tags"
