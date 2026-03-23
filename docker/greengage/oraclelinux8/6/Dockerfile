@@ -24,10 +24,8 @@ ARG LIBSIGAR_DOWNLOAD_URL="https://github.com/boundary/sigar"
 ARG LIBSIGAR_COMMIT_HASH="e8961a6674cc4d292e61b353b5c36bfc345434cc"
 ARG GPDB_REPO_URL="https://github.com/GreengageDB/greengage.git"
 ARG GPDB_VERSION="6.30.1"
-# There is no fresh release of diskquota in GreengageDB repo, use Arenadata's fork
-# When new release will be available, switch to GreengageDB repo
-ARG DISKQUOTA_DOWNLOAD_URL="https://github.com/arenadata/diskquota/archive/refs/tags"
-ARG DISKQUOTA_VERSION="2.3.0_arenadata9"
+ARG DISKQUOTA_DOWNLOAD_URL="https://github.com/GreengageDB/diskquota/archive/refs/tags"
+ARG DISKQUOTA_VERSION="2.4.0"
 ARG PXF_DOWNLOAD_URL="https://github.com/GreengageDB/pxf/archive/refs/tags"
 ARG PXF_VERSION="6.15.0"
 ARG GPBACKUP_DOWNLOAD_URL="https://github.com/GreengageDB/gpbackup/archive/refs/tags"
