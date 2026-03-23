@@ -206,15 +206,19 @@ RUN wget ${PXF_DOWNLOAD_URL}/${PXF_VERSION}.tar.gz -O /tmp/pxf-${PXF_VERSION}.ta
     && tar -xzf /tmp/pxf-${PXF_VERSION}.tar.gz --strip-components=1 -C /tmp/pxf \
     && cd /tmp/pxf \
     && GPHOME=/usr/local/greenplum-db \
+       PG_CONFIG=/usr/local/greenplum-db/bin/pg_config \
        PXF_HOME=/usr/local/pxf \
        make -j2 -C external-table install \
     && GPHOME=/usr/local/greenplum-db \
+       PG_CONFIG=/usr/local/greenplum-db/bin/pg_config \
        PXF_HOME=/usr/local/pxf \
        make -j2 -C fdw install \
     && GPHOME=/usr/local/greenplum-db \
+       PG_CONFIG=/usr/local/greenplum-db/bin/pg_config \
        PXF_HOME=/usr/local/pxf \
        make -j2 -C cli install \
     && GPHOME=/usr/local/greenplum-db \
+       PG_CONFIG=/usr/local/greenplum-db/bin/pg_config \
        PXF_HOME=/usr/local/pxf \
        make -j2 -C server install-server \
     && rm -rf \
