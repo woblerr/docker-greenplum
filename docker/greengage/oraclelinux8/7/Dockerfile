@@ -27,7 +27,7 @@ ARG GPDB_VERSION="7.4.1"
 ARG DISKQUOTA_DOWNLOAD_URL="https://github.com/arenadata/diskquota/archive/refs/tags"
 ARG DISKQUOTA_VERSION="2.3.0_arenadata9"
 ARG PXF_DOWNLOAD_URL="https://github.com/GreengageDB/pxf/archive/refs/tags"
-ARG PXF_VERSION="6.14.1"
+ARG PXF_VERSION="6.15.0"
 ARG GPBACKUP_DOWNLOAD_URL="https://github.com/GreengageDB/gpbackup/archive/refs/tags"
 ARG GPBACKUP_VERSION="1.31.1"
 # There is no fresh release of gpbackup-s3-plugin in GreengageDB repo
@@ -250,17 +250,17 @@ RUN wget ${PXF_DOWNLOAD_URL}/${PXF_VERSION}.tar.gz -O /tmp/pxf-${PXF_VERSION}.ta
     && mkdir -p /tmp/pxf \
     && tar -xzf /tmp/pxf-${PXF_VERSION}.tar.gz --strip-components=1 -C /tmp/pxf \
     && cd /tmp/pxf \
-    && PXF_HOME=/usr/local/pxf \
-       PG_CONFIG=/usr/local/greenplum-db/bin/pg_config \
+    && GPHOME=/usr/local/greenplum-db \
+       PXF_HOME=/usr/local/pxf \
        make -j2 -C external-table install \
-    && PXF_HOME=/usr/local/pxf \
-       PG_CONFIG=/usr/local/greenplum-db/bin/pg_config \
+    && GPHOME=/usr/local/greenplum-db \
+       PXF_HOME=/usr/local/pxf \
        make -j2 -C fdw install \
-    && PXF_HOME=/usr/local/pxf \
-       PG_CONFIG=/usr/local/greenplum-db/bin/pg_config \
+    && GPHOME=/usr/local/greenplum-db \
+       PXF_HOME=/usr/local/pxf \
        make -j2 -C cli install \
-    && PXF_HOME=/usr/local/pxf \
-       PG_CONFIG=/usr/local/greenplum-db/bin/pg_config \
+    && GPHOME=/usr/local/greenplum-db \
+       PXF_HOME=/usr/local/pxf \
        make -j2 -C server install-server \
     && rm -rf \
         /tmp/pxf \
