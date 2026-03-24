@@ -94,7 +94,7 @@ WarehousePG 7:
 open-gpdb 6:
 | Image | open-gpdb Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
 |---|---|---|---| ---|
-| opengpdb | 6.29.3| `6.29.3`, `6.29.3-ubuntu22.04` | - | `linux/amd64`, `linux/arm64` |
+| opengpdb | 6.29.5| `6.29.5`, `6.29.5-ubuntu22.04` | - | `linux/amd64`, `linux/arm64` |
 
 ## Pull
 Change `tag` to the version you need.
@@ -274,7 +274,7 @@ docker run -p 5432:5432 \
   -e GREENPLUM_PASSWORD=gparray \
   -e GREENPLUM_YEZZEY_ENABLE=true \
   -v $(pwd)/yproxy.yaml:/data/yproxy.yaml \
-  -d opengpdb:6.29.3
+  -d opengpdb:6.29.5
 ```
 
 ### Docker Compose
