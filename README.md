@@ -16,6 +16,8 @@ This project provides Docker images for running Greenplum Database (GPDB) and it
 - [WarehousePG](https://github.com/warehouse-pg/warehouse-pg) (WHPG)
 - [open-gpdb](https://github.com/open-gpdb/gpdb) (OpenGPDB)
 
+For [Apache Cloudberry](https://cloudberry.apache.org/) Docker images, see the [docker-cloudberry](https://github.com/woblerr/docker-cloudberry) repository.
+
 The Greenplum in docker provides the following features:
 - single-node deployment;
 - master and segments deployment;
@@ -74,7 +76,7 @@ Greenplum 7:
 Greengage 6:
 | Image | Greengage Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
 |---|---|---|---| ---|
-| greengage | 6.29.2| `6.29.2`, `6.29.2-ubuntu22.04` | `6.29.2-oraclelinux8` | `linux/amd64`, `linux/arm64` |
+| greengage | 6.30.1| `6.30.1`, `6.30.1-ubuntu22.04` | `6.30.1-oraclelinux8` | `linux/amd64`, `linux/arm64` |
 
 Greengage 7:
 | Image | Greengage Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
@@ -346,7 +348,7 @@ make build_gpdb_7_oraclelinux TAG_GPDB_7=7.1.0
 
 For Ubuntu based images:
 ```bash
-make build_greengage_6_ubuntu TAG_GREENGAGE_6=6.29.2
+make build_greengage_6_ubuntu TAG_GREENGAGE_6=6.30.1
 ```
 ```bash
 make build_greengage_7_ubuntu TAG_GREENGAGE_7=7.4.1
@@ -354,7 +356,7 @@ make build_greengage_7_ubuntu TAG_GREENGAGE_7=7.4.1
 
 For Oracle Linux based images:
 ```bash
-make build_greengage_6_oraclelinux TAG_GREENGAGE_6=6.29.2
+make build_greengage_6_oraclelinux TAG_GREENGAGE_6=6.30.1
 ```
 ```bash
 make build_greengage_7_oraclelinux TAG_GREENGAGE_7=7.4.1
@@ -394,7 +396,7 @@ docker buildx build -f docker/greenplum/ubuntu22.04/6/Dockerfile -t greenplum:6.
 
 Greengage simple manual build:
 ```bash
-docker buildx build -f docker/greengage/ubuntu22.04/6/Dockerfile -t greengage:6.29.2 .
+docker buildx build -f docker/greengage/ubuntu22.04/6/Dockerfile -t greengage:6.30.1 .
 ```
 ```bash
 docker buildx build -f docker/greengage/ubuntu22.04/7/Dockerfile -t greengage:7.4.1 .
@@ -402,7 +404,7 @@ docker buildx build -f docker/greengage/ubuntu22.04/7/Dockerfile -t greengage:7.
 
 Greengage OracleLinux manual build:
 ```bash
-docker buildx build -f docker/greengage/oraclelinux8/6/Dockerfile -t greengage:6.29.2-oraclelinux8 .
+docker buildx build -f docker/greengage/oraclelinux8/6/Dockerfile -t greengage:6.30.1-oraclelinux8 .
 ```
 ```bash
 docker buildx build -f docker/greengage/oraclelinux8/7/Dockerfile -t greengage:7.4.1-oraclelinux8 .
