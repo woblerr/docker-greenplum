@@ -21,7 +21,7 @@ ARG WALG_DOWNLOAD_URL="https://github.com/wal-g/wal-g"
 # Wait new WAL-G release
 ARG WALG_VERSION="4b33c88939ce0cc23acc5f89dcf5e427c50923d9"
 ARG YPROXY_DOWNLOAD_URL="https://github.com/open-gpdb/yproxy/archive/refs/tags"
-ARG YPROXY_VERSION="1.7.2"
+ARG YPROXY_VERSION="1.7.3"
 ARG YEZZEY_DOWNLOAD_URL="https://github.com/open-gpdb/yezzey"
 # Wait new yezzey release
 ARG YEZZEY_VERSION="e32a6eb9bf711d23d80c1b6d9cf5c47a6778b0b5"
