@@ -6,7 +6,7 @@ ARG GPXERCES_VERSION="v3.1.2-p1"
 ARG LIBSIGAR_DOWNLOAD_URL="https://github.com/boundary/sigar"
 ARG LIBSIGAR_COMMIT_HASH="e8961a6674cc4d292e61b353b5c36bfc345434cc"
 ARG GPDB_DOWNLOAD_URL="https://github.com/open-gpdb/gpdb/archive/refs/tags"
-ARG GPDB_VERSION="6.29.3"
+ARG GPDB_VERSION="6.29.5"
 ARG DISKQUOTA_DOWNLOAD_URL="https://github.com/woblerr/diskquota/archive/refs/tags"
 ARG DISKQUOTA_VERSION="2.3.0"
 ARG PXF_DOWNLOAD_URL="https://github.com/woblerr/pxf/archive/refs/tags"
@@ -166,14 +166,14 @@ RUN wget ${GPDB_DOWNLOAD_URL}/${GPDB_VERSION}.tar.gz -O /tmp/gpdb-${GPDB_VERSION
         /tmp/gpdb-${GPDB_VERSION}.tar.gz
 
 # diskquota
-# Patched for compatibility with Open GPDB 6.29.3
+# Patched for compatibility with Open GPDB 6.29.5
 # The GetUserNameFromId function signature changed in commit:
 # https://github.com/open-gpdb/gpdb/commit/5cbe6b50acb061a7f1b661f8e344d5bcd3518b4d
 # Added 'bool noerr' parameter for new regrole type support
 RUN wget ${DISKQUOTA_DOWNLOAD_URL}/${DISKQUOTA_VERSION}.tar.gz -O /tmp/diskquota-${DISKQUOTA_VERSION}.tar.gz \
     && mkdir -p /tmp/diskquota \
     && tar -xzf /tmp/diskquota-${DISKQUOTA_VERSION}.tar.gz --strip-components=1 -C /tmp/diskquota \
-    # Patch quotamodel.c for Open GPDB 6.29.3
+    # Patch quotamodel.c for Open GPDB 6.29.5
     && sed -i 's/GetUserNameFromId(relowner)/GetUserNameFromId(relowner, false)/g' /tmp/diskquota/src/quotamodel.c \
     && mkdir -p /tmp/diskquota/build \
     && cd /tmp/diskquota/build \
