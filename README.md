@@ -382,7 +382,7 @@ make build_warehousepg_7_oraclelinux TAG_WAREHOUSEPG_7=7.3.1-WHPG
 
 For Ubuntu based images:
 ```bash
-make build_opengpdb_6_ubuntu TAG_OPENGPDB_6=6.29.3
+make build_opengpdb_6_ubuntu TAG_OPENGPDB_6=6.29.5
 ```
 
 **Manual build examples:**
@@ -426,7 +426,7 @@ docker buildx build -f docker/warehousepg/oraclelinux8/7/Dockerfile -t warehouse
 
 open-gpdb simple manual build:
 ```bash
-docker buildx build -f docker/opengpdb/ubuntu22.04/6/Dockerfile -t opengpdb:6.29.3 .
+docker buildx build -f docker/opengpdb/ubuntu22.04/6/Dockerfile -t opengpdb:6.29.5 .
 ```
 
 Manual build with specific component version for `linux/amd64` platform:
