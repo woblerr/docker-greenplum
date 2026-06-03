@@ -17,7 +17,7 @@ ARG GOLANG_VERSION="1.24.11"
 ARG LIBSIGAR_DOWNLOAD_URL="https://github.com/boundary/sigar"
 ARG LIBSIGAR_COMMIT_HASH="e8961a6674cc4d292e61b353b5c36bfc345434cc"
 ARG GPDB_REPO_URL="https://github.com/GreengageDB/greengage.git"
-ARG GPDB_VERSION="6.30.1"
+ARG GPDB_VERSION="6.31.0"
 ARG DISKQUOTA_DOWNLOAD_URL="https://github.com/GreengageDB/diskquota/archive/refs/tags"
 ARG DISKQUOTA_VERSION="2.4.0"
 ARG PXF_DOWNLOAD_URL="https://github.com/GreengageDB/pxf/archive/refs/tags"
@@ -30,7 +30,7 @@ ARG GPBACKMAN_DOWNLOAD_URL="https://github.com/woblerr/gpbackman/archive/refs/ta
 ARG GPBACKMAN_VERSION="v0.8.1"
 # Greengage use pgBackRest fork for physical backups.
 # It is not clear whether wal-g will work correctly.
-# Will be error like: "unknown flavor: PostgreSQL 9.4.26 (Greengage Database 6.30.1 build dev)"
+# Will be error like: "unknown flavor: PostgreSQL 9.4.26 (Greengage Database 6.31.0 build dev)"
 #ARG WALG_DOWNLOAD_URL="https://github.com/wal-g/wal-g"
 ## Wait new WAL-G release
 #ARG WALG_VERSION="4b33c88939ce0cc23acc5f89dcf5e427c50923d9"
