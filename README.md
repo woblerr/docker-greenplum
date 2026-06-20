@@ -96,7 +96,7 @@ WarehousePG 7:
 open-gpdb 6:
 | Image | open-gpdb Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
 |---|---|---|---| ---|
-| opengpdb | 6.29.5| `6.29.5`, `6.29.5-ubuntu22.04` | - | `linux/amd64`, `linux/arm64` |
+| opengpdb | 6.29.8| `6.29.8`, `6.29.8-ubuntu22.04` | - | `linux/amd64`, `linux/arm64` |
 
 ## Pull
 Change `tag` to the version you need.
@@ -276,7 +276,7 @@ docker run -p 5432:5432 \
   -e GREENPLUM_PASSWORD=gparray \
   -e GREENPLUM_YEZZEY_ENABLE=true \
   -v $(pwd)/yproxy.yaml:/data/yproxy.yaml \
-  -d opengpdb:6.29.5
+  -d opengpdb:6.29.8
 ```
 
 ### Docker Compose
@@ -384,7 +384,7 @@ make build_warehousepg_7_oraclelinux TAG_WAREHOUSEPG_7=7.3.1-WHPG
 
 For Ubuntu based images:
 ```bash
-make build_opengpdb_6_ubuntu TAG_OPENGPDB_6=6.29.5
+make build_opengpdb_6_ubuntu TAG_OPENGPDB_6=6.29.8
 ```
 
 **Manual build examples:**
@@ -428,7 +428,7 @@ docker buildx build -f docker/warehousepg/oraclelinux8/7/Dockerfile -t warehouse
 
 open-gpdb simple manual build:
 ```bash
-docker buildx build -f docker/opengpdb/ubuntu22.04/6/Dockerfile -t opengpdb:6.29.5 .
+docker buildx build -f docker/opengpdb/ubuntu22.04/6/Dockerfile -t opengpdb:6.29.8 .
 ```
 
 Manual build with specific component version for `linux/amd64` platform:
