@@ -86,12 +86,12 @@ Greengage 7:
 WarehousePG 6:
 | Image | WarehousePG Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
 |---|---|---|---| ---|
-| warehousepg | 6.27.3-WHPG| `6.27.3-WHPG`, `6.27.3-WHPG-ubuntu22.04` | `6.27.3-WHPG-oraclelinux8` | `linux/amd64`, `linux/arm64` |
+| warehousepg | 6.27.5-WHPG| `6.27.5-WHPG`, `6.27.5-WHPG-ubuntu22.04` | `6.27.5-WHPG-oraclelinux8` | `linux/amd64`, `linux/arm64` |
 
 WarehousePG 7:
 | Image | WarehousePG Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
 |---|---|---|---| ---|
-| warehousepg | 7.3.1-WHPG| `7.3.1-WHPG`, `7.3.1-WHPG-ubuntu22.04` | `7.3.1-WHPG-oraclelinux8` | `linux/amd64`, `linux/arm64` |
+| warehousepg | 7.4.1-WHPG| `7.4.1-WHPG`, `7.4.1-WHPG-ubuntu22.04` | `7.4.1-WHPG-oraclelinux8` | `linux/amd64`, `linux/arm64` |
 
 open-gpdb 6:
 | Image | open-gpdb Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
