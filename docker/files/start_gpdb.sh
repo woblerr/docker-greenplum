@@ -38,8 +38,12 @@ setup_version_config() {
     # Get gpdb major version from gpinitsystem command.
     # It's necessary to know the version to operate with the correct directories.
     # Example: gpinitsystem 6.26.4 build dev
-    gp_major_version=$(gpinitsystem --version | cut -d' ' -f2 | cut -d'.' -f1)
-    case ${gp_major_version} in
+    gp_version_string=$(gpinitsystem --version)
+    gp_major_version=""
+    if [[ "${gp_version_string}" =~ ([0-9]+)[.][0-9]+[.][0-9]+ ]]; then
+        gp_major_version="${BASH_REMATCH[1]}"
+    fi
+    case "${gp_major_version}" in
       "6")
         gp_log_dir="pg_log"
         gp_master_data_dir_prefix="MASTER"
@@ -49,7 +53,7 @@ setup_version_config() {
         gp_master_data_dir_prefix="COORDINATOR"
         ;;
       *)
-        error_and_exit "Invalid Greenplum version: ${gp_major_version}"
+        error_and_exit "Invalid Greenplum version from gpinitsystem output: ${gp_version_string}"
         ;;
     esac
 }

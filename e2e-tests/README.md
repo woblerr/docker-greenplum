@@ -26,7 +26,7 @@ make test-e2e
 
 Primary cluster is described in `e2e-tests/docker-compose.gpdb.yml`, standby cluster is described in `e2e-tests/docker-compose.gpdb-restore.yml`, and S3 compatible storage is described in `e2e-tests/docker-compose.s3.yml`.
 
-The test validates WAL-G backup and restore functionality for Greenplum (works with GPDB and WarehousePG; **not supported for Greengage** due to changed database flavor):
+The test validates WAL-G backup and restore functionality for Greenplum-compatible images with WAL-G support:
 
 1. **Full backup test**:
    - Creates full backup on primary cluster
@@ -59,7 +59,7 @@ or manually:
 ```bash
 cd [docker-greenplum-root]/e2e-tests
 docker compose -f docker-compose.s3.yml -f docker-compose.gpdb.yml -f docker-compose.gpdb-restore.yml up -d
-GREENPLUM_PASSWORD=$(cat ../docker-compose/secrets/gpdb_password) ./scripts/e2e-test.sh
+GREENPLUM_PASSWORD=$(cat ../docker-compose/secrets/gpdb_password) GP_VERSION=$(grep '^CONFIG_FOLDER=' .env | head -1 | cut -d'=' -f2 | tr -d '"') ./scripts/e2e-test.sh
 docker compose -f docker-compose.s3.yml -f docker-compose.gpdb.yml -f docker-compose.gpdb-restore.yml down
 ```
 
