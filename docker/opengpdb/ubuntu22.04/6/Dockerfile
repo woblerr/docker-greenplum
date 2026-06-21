@@ -1,30 +1,29 @@
 ARG REPO_BUILD_TAG
 ARG UBUNTU_VERSION="22.04"
-ARG GOLANG_VERSION="1.24.11"
+ARG GOLANG_VERSION="1.25.11"
 ARG GPXERCES_DOWNLOAD_URL="https://github.com/woblerr/gp-xerces/archive/refs/tags"
 ARG GPXERCES_VERSION="v3.1.2-p1"
 ARG LIBSIGAR_DOWNLOAD_URL="https://github.com/boundary/sigar"
 ARG LIBSIGAR_COMMIT_HASH="e8961a6674cc4d292e61b353b5c36bfc345434cc"
 ARG GPDB_DOWNLOAD_URL="https://github.com/open-gpdb/gpdb/archive/refs/tags"
-ARG GPDB_VERSION="6.29.5"
+ARG GPDB_VERSION="6.29.8"
 ARG DISKQUOTA_DOWNLOAD_URL="https://github.com/woblerr/diskquota/archive/refs/tags"
 ARG DISKQUOTA_VERSION="2.3.0"
 ARG PXF_DOWNLOAD_URL="https://github.com/open-gpdb/pxf/archive/refs/tags"
-ARG PXF_VERSION="6.10.2"
+ARG PXF_VERSION="6.10.3"
 ARG GPBACKUP_DOWNLOAD_URL="https://github.com/woblerr/gpbackup/archive/refs/tags"
 ARG GPBACKUP_VERSION="1.30.5"
 ARG GPBACKUP_S3_PLUGIN_DOWNLOAD_URL="https://github.com/woblerr/gpbackup-s3-plugin/archive/refs/tags"
 ARG GPBACKUP_S3_PLUGIN_VERSION="1.10.2"
 ARG GPBACKMAN_DOWNLOAD_URL="https://github.com/woblerr/gpbackman/archive/refs/tags"
-ARG GPBACKMAN_VERSION="v0.8.1"
+ARG GPBACKMAN_VERSION="v0.10.0"
 ARG WALG_DOWNLOAD_URL="https://github.com/wal-g/wal-g"
 # Wait new WAL-G release
-ARG WALG_VERSION="4b33c88939ce0cc23acc5f89dcf5e427c50923d9"
+ARG WALG_VERSION="3c54030dda939d21a04adf9402adf9f45ce3d547"
 ARG YPROXY_DOWNLOAD_URL="https://github.com/open-gpdb/yproxy/archive/refs/tags"
-ARG YPROXY_VERSION="1.7.3"
+ARG YPROXY_VERSION="1.7.5"
 ARG YEZZEY_DOWNLOAD_URL="https://github.com/open-gpdb/yezzey"
-# Wait new yezzey release
-ARG YEZZEY_VERSION="e32a6eb9bf711d23d80c1b6d9cf5c47a6778b0b5"
+ARG YEZZEY_VERSION="1.8.8"
 
 FROM ubuntu:${UBUNTU_VERSION} AS builder
 
@@ -166,14 +165,14 @@ RUN wget ${GPDB_DOWNLOAD_URL}/${GPDB_VERSION}.tar.gz -O /tmp/gpdb-${GPDB_VERSION
         /tmp/gpdb-${GPDB_VERSION}.tar.gz
 
 # diskquota
-# Patched for compatibility with Open GPDB 6.29.5
+# Patched for compatibility with Open GPDB 6.29.x
 # The GetUserNameFromId function signature changed in commit:
 # https://github.com/open-gpdb/gpdb/commit/5cbe6b50acb061a7f1b661f8e344d5bcd3518b4d
 # Added 'bool noerr' parameter for new regrole type support
 RUN wget ${DISKQUOTA_DOWNLOAD_URL}/${DISKQUOTA_VERSION}.tar.gz -O /tmp/diskquota-${DISKQUOTA_VERSION}.tar.gz \
     && mkdir -p /tmp/diskquota \
     && tar -xzf /tmp/diskquota-${DISKQUOTA_VERSION}.tar.gz --strip-components=1 -C /tmp/diskquota \
-    # Patch quotamodel.c for Open GPDB 6.29.5
+    # Patch quotamodel.c for Open GPDB 6.29.x
     && sed -i 's/GetUserNameFromId(relowner)/GetUserNameFromId(relowner, false)/g' /tmp/diskquota/src/quotamodel.c \
     && mkdir -p /tmp/diskquota/build \
     && cd /tmp/diskquota/build \
