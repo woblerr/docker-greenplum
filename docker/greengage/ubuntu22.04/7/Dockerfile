@@ -24,7 +24,7 @@ ARG GPBACKMAN_DOWNLOAD_URL="https://github.com/woblerr/gpbackman/archive/refs/ta
 ARG GPBACKMAN_VERSION="v0.10.0"
 ARG WALG_DOWNLOAD_URL="https://github.com/wal-g/wal-g"
 # Wait new WAL-G release
-ARG WALG_VERSION="3c54030dda939d21a04adf9402adf9f45ce3d547"
+ARG WALG_VERSION="e4843b849ca05a27655794888341de2662035853"
 
 FROM ubuntu:${UBUNTU_VERSION} AS builder
 
