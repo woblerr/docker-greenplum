@@ -350,6 +350,15 @@ RUN dnf -y install \
     && dnf clean all \
     && rm -rf /var/cache/dnf
 
+# python2.7 runtime dependencies
+RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output /tmp/get-pip.py \
+    && python2 /tmp/get-pip.py \
+    && pip2 install --no-cache-dir \
+        future==1.0.0 \
+    && rm -rf \ 
+      /tmp/get-pip.py \
+      /root/.cache/pip
+
 # Grab gosu for easy step-down from root
 # https://github.com/tianon/gosu/releases
 # https://github.com/tianon/gosu/blob/master/INSTALL.md

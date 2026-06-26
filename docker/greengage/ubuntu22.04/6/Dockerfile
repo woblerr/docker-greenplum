@@ -300,6 +300,13 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# python2.7 runtime dependencies
+RUN curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output /tmp/get-pip.py \
+    && python2.7 /tmp/get-pip.py \
+    && pip2.7 install --no-cache-dir \
+        future==1.0.0 \
+    && rm -rf /tmp/get-pip.py /root/.cache/pip
+
 RUN groupadd --gid ${GREENPLUM_GID} ${GREENPLUM_GROUP} \
     && useradd --shell /bin/bash --uid ${GREENPLUM_UID} --gid ${GREENPLUM_GID} -m ${GREENPLUM_USER} \
     && locale-gen en_US.UTF-8 \
