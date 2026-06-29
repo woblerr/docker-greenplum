@@ -9,8 +9,6 @@
 # ----
 # Greengage 7 uses Python 3 (unlike Greengage 6 which used Python 2)
 # ----
-# Wal-G currently disabled
-# ----
 # For compiling Greengage zstd static library (.a files) is needed.
 # See https://github.com/GreengageDB/greengage/commit/7185bf85ea8f4abdfdeb08d5a53180ea2f389728
 # On Ubuntu it's not needed as libzstd-dev contains .a files
@@ -19,7 +17,7 @@
 # ----
 ARG REPO_BUILD_TAG
 ARG OL_VERSION="8"
-ARG GOLANG_VERSION="1.24.11"
+ARG GOLANG_VERSION="1.25.11"
 ARG GPDB_DOWNLOAD_URL="https://github.com/GreengageDB/greengage/archive/refs/tags"
 ARG GPDB_VERSION="7.4.1"
 ARG DISKQUOTA_DOWNLOAD_URL="https://github.com/GreengageDB/diskquota/archive/refs/tags"
@@ -31,13 +29,10 @@ ARG GPBACKUP_VERSION="1.31.1"
 ARG GPBACKUP_S3_PLUGIN_DOWNLOAD_URL="https://github.com/GreengageDB/gpbackup-s3-plugin/archive/refs/tags"
 ARG GPBACKUP_S3_PLUGIN_VERSION="1.11.0"
 ARG GPBACKMAN_DOWNLOAD_URL="https://github.com/woblerr/gpbackman/archive/refs/tags"
-ARG GPBACKMAN_VERSION="v0.8.1"
-# Greengage use pgBackRest fork for physical backups.
-# It is not clear whether wal-g will work correctly.
-# Will be error like: "unknown flavor: PostgreSQL ... (Greengage Database ... build dev)"
-#ARG WALG_DOWNLOAD_URL="https://github.com/wal-g/wal-g"
-## Wait new WAL-G release
-#ARG WALG_VERSION="4b33c88939ce0cc23acc5f89dcf5e427c50923d9"
+ARG GPBACKMAN_VERSION="v0.10.0"
+ARG WALG_DOWNLOAD_URL="https://github.com/wal-g/wal-g"
+# Wait new WAL-G release
+ARG WALG_VERSION="e4843b849ca05a27655794888341de2662035853"
 ARG GOSU_VERSION="1.19"
 ARG ZSTD_VERSION="1.5.7"
 ARG ZSTD_DOWNLOAD_URL="https://github.com/facebook/zstd/archive/refs/tags"
@@ -188,8 +183,8 @@ ARG GPBACKMAN_DOWNLOAD_URL
 ARG GPBACKMAN_VERSION
 ARG PXF_DOWNLOAD_URL
 ARG PXF_VERSION
-#ARG WALG_DOWNLOAD_URL
-#ARG WALG_VERSION
+ARG WALG_DOWNLOAD_URL
+ARG WALG_VERSION
 
 RUN mkdir -p /opt/go \
     && arch="$(uname -m)" \
@@ -229,15 +224,15 @@ RUN wget ${GPBACKMAN_DOWNLOAD_URL}/${GPBACKMAN_VERSION}.tar.gz -O /tmp/gpbackman
 ## wal-g
 ## Don't use USE_LZO=1, there is no need to build with WAL-E compatibility
 ## See https://github.com/wal-g/wal-g/issues/1412#issuecomment-1401890162
-#RUN git clone ${WALG_DOWNLOAD_URL} /tmp/wal-g \
-#    && cd /tmp/wal-g \
-#    && git checkout ${WALG_VERSION} \
-#    && USE_BROTLI=1 \
-#       USE_LIBSODIUM=1 \
-#       make deps \
-#    && USE_BROTLI=1 \
-#       USE_LIBSODIUM=1 \
-#       make gp_build
+RUN git clone ${WALG_DOWNLOAD_URL} /tmp/wal-g \
+    && cd /tmp/wal-g \
+    && git checkout ${WALG_VERSION} \
+    && USE_BROTLI=1 \
+       USE_LIBSODIUM=1 \
+       make deps \
+    && USE_BROTLI=1 \
+       USE_LIBSODIUM=1 \
+       make gp_build
 
 # pxf
 # Build pxf without tests
@@ -412,7 +407,7 @@ COPY --from=go_builder \
 COPY --from=go_builder /opt/go/bin/gpbackup_s3_plugin /usr/local/greenplum-db/bin/gpbackup_s3_plugin
 COPY --from=go_builder /usr/local/pxf /usr/local/pxf
 COPY --from=go_builder /tmp/gpbackman/gpbackman /usr/local/greenplum-db/bin/gpbackman
-#COPY --from=go_builder /tmp/wal-g/main/gp/wal-g /usr/local/greenplum-db/bin/wal-g
+COPY --from=go_builder /tmp/wal-g/main/gp/wal-g /usr/local/greenplum-db/bin/wal-g
 COPY --chmod=755 docker/files/entrypoint.sh /entrypoint.sh
 COPY --chmod=755 docker/files/start_gpdb.sh /start_gpdb.sh
 

@@ -5,7 +5,7 @@
 # ----
 ARG REPO_BUILD_TAG
 ARG OL_VERSION="8"
-ARG GOLANG_VERSION="1.24.11"
+ARG GOLANG_VERSION="1.25.11"
 ARG GPXERCES_DOWNLOAD_URL="https://github.com/woblerr/gp-xerces/archive/refs/tags"
 ARG GPXERCES_VERSION="v3.1.2-p1"
 ARG LIBSIGAR_DOWNLOAD_URL="https://github.com/boundary/sigar"
@@ -21,10 +21,10 @@ ARG GPBACKUP_VERSION="1.30.5"
 ARG GPBACKUP_S3_PLUGIN_DOWNLOAD_URL="https://github.com/woblerr/gpbackup-s3-plugin/archive/refs/tags"
 ARG GPBACKUP_S3_PLUGIN_VERSION="1.10.2"
 ARG GPBACKMAN_DOWNLOAD_URL="https://github.com/woblerr/gpbackman/archive/refs/tags"
-ARG GPBACKMAN_VERSION="v0.8.1"
+ARG GPBACKMAN_VERSION="v0.10.0"
 ARG WALG_DOWNLOAD_URL="https://github.com/wal-g/wal-g"
 # Wait new WAL-G release
-ARG WALG_VERSION="4b33c88939ce0cc23acc5f89dcf5e427c50923d9"
+ARG WALG_VERSION="e4843b849ca05a27655794888341de2662035853"
 ARG GOSU_VERSION="1.19"
 
 FROM oraclelinux:${OL_VERSION} AS builder
