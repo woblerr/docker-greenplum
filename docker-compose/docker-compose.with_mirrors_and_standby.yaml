@@ -45,7 +45,7 @@ services:
       - "${EXPOSE_MASTER_STANDBY_PORT}:5432"
     environment:
       - GREENPLUM_DEPLOYMENT=standby
-      - GREENPLUM_COORDINATOR_HOSTNAME=master
+      - GREENPLUM_MASTER_HOSTNAME=master
     volumes:
       # - gpdb-standby-data:/data
       - ./conf/ssh/authorized_keys:/tmp/authorized_keys

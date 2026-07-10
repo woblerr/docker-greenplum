@@ -290,10 +290,10 @@ initialize_and_start_gpdb_standby() {
     for host in $(cat ${gp_init_host_file}); do
         ssh-keyscan -t rsa $host >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
     done
-    if [ -n "${GREENPLUM_COORDINATOR_HOSTNAME:-}" ]; then
-        ssh-keyscan -t rsa "${GREENPLUM_COORDINATOR_HOSTNAME}" >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
+    if [ -n "${GREENPLUM_MASTER_HOSTNAME:-}" ]; then
+        ssh-keyscan -t rsa "${GREENPLUM_MASTER_HOSTNAME}" >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
     else
-        echo "WARNING - GREENPLUM_COORDINATOR_HOSTNAME is not set, skipping ssh-keyscan for coordinator"
+        echo "WARNING - GREENPLUM_MASTER_HOSTNAME is not set, skipping ssh-keyscan for master/coordinator"
     fi
     chmod 644 /home/${GREENPLUM_USER}/.ssh/known_hosts
     trap "echo 'INFO - Shutdown standby master host' && end_flag=1" TERM INT

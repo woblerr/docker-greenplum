@@ -86,14 +86,14 @@ The test validates standby master promotion and cluster recovery functionality:
 Run:
 
 ```bash
-make test-e2e-standby-coordinator
+make test-e2e-standby-master
 ```
 
 or
 
 ```bash
 cd e2e-tests
-make test-e2e-standby-coordinator
+make test-e2e-standby-master
 ```
 
 or manually:
@@ -101,7 +101,7 @@ or manually:
 ```bash
 cd [docker-greenplum-root]/e2e-tests
 docker compose -f ../docker-compose/docker-compose.with_mirrors_and_standby.yaml up -d
-GREENPLUM_PASSWORD=$(cat ../docker-compose/secrets/gpdb_password) ./scripts/e2e-standby-coordinator-test.sh
+GREENPLUM_PASSWORD=$(cat ../docker-compose/secrets/gpdb_password) ./scripts/e2e-standby-master-test.sh
 docker compose -f ../docker-compose/docker-compose.with_mirrors_and_standby.yaml down
 ```
 

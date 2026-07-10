@@ -52,7 +52,7 @@ Environment variables supported by this image:
 * `GREENPLUM_PXF_ENABLE` - enable PXF, default `false`;
 * `GREENPLUM_WALG_ENABLE` - enable WAL-G, default `false`;
 * `GREENPLUM_STANDBY_HOSTNAME` - standby master hostname, used when `GREENPLUM_DEPLOYMENT=master` to add standby's SSH host key to `known_hosts` and initialize standby master via `gpinitstandby`, optional;
-* `GREENPLUM_COORDINATOR_HOSTNAME` - master/coordinator hostname, used when `GREENPLUM_DEPLOYMENT=standby` to add master/coordinator's SSH host key to `known_hosts`; required when `GREENPLUM_DEPLOYMENT=standby`;
+* `GREENPLUM_MASTER_HOSTNAME` - master/coordinator hostname, used when `GREENPLUM_DEPLOYMENT=standby` to add master/coordinator's SSH host key to `known_hosts`; required when `GREENPLUM_DEPLOYMENT=standby`;
 
 Required environment variables:
 * `GREENPLUM_PASSWORD` - password for `${GREENPLUM_USER}` user, **required**;
@@ -315,7 +315,7 @@ Standby master mounts:
 ```yaml
     environment:
       - GREENPLUM_DEPLOYMENT=standby
-      - GREENPLUM_COORDINATOR_HOSTNAME=master
+      - GREENPLUM_MASTER_HOSTNAME=master
     volumes:
       - ./conf/ssh/authorized_keys:/tmp/authorized_keys
       - ./conf/hostfile_gpinitsystem:/tmp/hostfile_gpinitsystem
@@ -323,7 +323,7 @@ Standby master mounts:
       - ./conf/ssh/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
 ```
 
-`GREENPLUM_COORDINATOR_HOSTNAME` is required to add master/coordinator's SSH host key to `known_hosts` on standby. `hostfile_gpinitsystem` and SSH keys are required for standby to connect to segments after failover via `gpactivatestandby`.
+`GREENPLUM_MASTER_HOSTNAME` is required to add master/coordinator's SSH host key to `known_hosts` on standby. `hostfile_gpinitsystem` and SSH keys are required for standby to connect to segments after failover via `gpactivatestandby`.
 
 The standby master initialization is triggered only during the initial cluster setup. If the standby data volume is recreated later while the active master data persists, it will not be initialized automatically. Manual restoration via `gpinitstandby` is required.
 
