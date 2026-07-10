@@ -22,6 +22,7 @@ The Greenplum in docker provides the following features:
 - single-node deployment;
 - master and segments deployment;
 - support for segment mirroring;
+- standby master support;
 - gpperfmon (GPDB 6 only);
 - diskquota;
 - gpbackup/gprestore;
@@ -42,7 +43,7 @@ Environment variables supported by this image:
 * `GREENPLUM_UID` - UID of `${GREENPLUM_USER}` user, default `1001`;
 * `GREENPLUM_GROUP` - group name of `${GREENPLUM_USER}` user, default `gpadmin`;
 * `GREENPLUM_GID` - GID of `${GREENPLUM_USER}` user, default `1001`;
-* `GREENPLUM_DEPLOYMENT` - Greenplum deployment type, default `singlenode`, available values: `singlenode`, `master`, `segment`;
+* `GREENPLUM_DEPLOYMENT` - Greenplum deployment type, default `singlenode`, available values: `singlenode`, `master`, `segment`, `standby`;
 * `GREENPLUM_DATA_DIRECTORY` - Greenplum data directory location, default `/data`;
 * `GREENPLUM_SEG_PREFIX` - Greenplum segment prefix, default `gpseg`;
 * `GREENPLUM_DATABASE_NAME` - Greenplum database name, default `demo`, this database will be created during the initialization;
@@ -50,6 +51,8 @@ Environment variables supported by this image:
 * `GREENPLUM_DISKQUOTA_ENABLE` - enable diskquota, default `false`;
 * `GREENPLUM_PXF_ENABLE` - enable PXF, default `false`;
 * `GREENPLUM_WALG_ENABLE` - enable WAL-G, default `false`;
+* `GREENPLUM_STANDBY_HOSTNAME` - standby master hostname, used when `GREENPLUM_DEPLOYMENT=master` to add standby's SSH host key to `known_hosts` and initialize standby master via `gpinitstandby`, optional;
+* `GREENPLUM_COORDINATOR_HOSTNAME` - master/coordinator hostname, used when `GREENPLUM_DEPLOYMENT=standby` to add master/coordinator's SSH host key to `known_hosts`; required when `GREENPLUM_DEPLOYMENT=standby`;
 
 Required environment variables:
 * `GREENPLUM_PASSWORD` - password for `${GREENPLUM_USER}` user, **required**;
@@ -306,6 +309,24 @@ Segments mounts:
        - ./conf/ssh/authorized_keys:/tmp/authorized_keys
 ```
 
+#### Standby Master
+
+Standby master mounts:
+```yaml
+    environment:
+      - GREENPLUM_DEPLOYMENT=standby
+      - GREENPLUM_COORDINATOR_HOSTNAME=master
+    volumes:
+      - ./conf/ssh/authorized_keys:/tmp/authorized_keys
+      - ./conf/hostfile_gpinitsystem:/tmp/hostfile_gpinitsystem
+      - ./conf/ssh/id_rsa:/home/gpadmin/.ssh/id_rsa
+      - ./conf/ssh/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
+```
+
+`GREENPLUM_COORDINATOR_HOSTNAME` is required to add master/coordinator's SSH host key to `known_hosts` on standby. `hostfile_gpinitsystem` and SSH keys are required for standby to connect to segments after failover via `gpactivatestandby`.
+
+The standby master initialization is triggered only during the initial cluster setup. If the standby data volume is recreated later while the active master data persists, it will not be initialized automatically. Manual restoration via `gpinitstandby` is required.
+
 The image name, version and `CONFIG_FOLDER` variable should be set in the `.env` file. See the example `.env` file in the `docker-compose` directory.
 
 #### Run
@@ -322,6 +343,11 @@ docker compose -f ./docker-compose/docker-compose.no_mirrors_persistent.yaml up 
 Run cluster with 1 master and 2 segments with mirroring:
 ```bash
 docker compose -f ./docker-compose/docker-compose.with_mirrors.yaml up -d
+```
+
+Run cluster with 1 master, 1 standby master and 2 segments with mirroring:
+```bash
+docker compose -f ./docker-compose/docker-compose.with_mirrors_and_standby.yaml up -d
 ```
 
 ## Build

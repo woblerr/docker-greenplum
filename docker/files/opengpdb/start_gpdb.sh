@@ -38,8 +38,12 @@ setup_version_config() {
     # Get gpdb major version from gpinitsystem command.
     # It's necessary to know the version to operate with the correct directories.
     # Example: gpinitsystem 6.26.4 build dev
-    gp_major_version=$(gpinitsystem --version | cut -d' ' -f2 | cut -d'.' -f1)
-    case ${gp_major_version} in
+    gp_version_string=$(gpinitsystem --version)
+    gp_major_version=""
+    if [[ "${gp_version_string}" =~ ([0-9]+)[.][0-9]+[.][0-9]+ ]]; then
+        gp_major_version="${BASH_REMATCH[1]}"
+    fi
+    case "${gp_major_version}" in
       "6")
         gp_log_dir="pg_log"
         gp_master_data_dir_prefix="MASTER"
@@ -49,7 +53,7 @@ setup_version_config() {
         gp_master_data_dir_prefix="COORDINATOR"
         ;;
       *)
-        error_and_exit "Invalid Greenplum version: ${gp_major_version}"
+        error_and_exit "Invalid Greenplum version from gpinitsystem output: ${gp_version_string}"
         ;;
     esac
 }
@@ -154,6 +158,12 @@ setup_hostfile_gpinitsystem(){
 generate_hostfile_gpinitsystem() {
     if [ ! -f "${gp_init_host_file}" ] ; then
         echo "${gp_hostname}" > ${gp_init_host_file}
+    fi
+}
+
+check_hostfile_gpinitsystem() {
+    if [ ! -f "${gp_init_host_file}" ]; then
+        error_and_exit "Hostfile ${gp_init_host_file} is required but not found. Please mount hostfile_gpinitsystem."
     fi
 }
 
@@ -274,6 +284,25 @@ initialize_and_start_gpdb_segments() {
     done
 }
 
+initialize_and_start_gpdb_standby() {
+    local end_flag=""
+    echo "INFO - Initializing standby master host"
+    for host in $(cat ${gp_init_host_file}); do
+        ssh-keyscan -t rsa $host >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
+    done
+    if [ -n "${GREENPLUM_COORDINATOR_HOSTNAME:-}" ]; then
+        ssh-keyscan -t rsa "${GREENPLUM_COORDINATOR_HOSTNAME}" >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
+    else
+        echo "WARNING - GREENPLUM_COORDINATOR_HOSTNAME is not set, skipping ssh-keyscan for coordinator"
+    fi
+    chmod 644 /home/${GREENPLUM_USER}/.ssh/known_hosts
+    trap "echo 'INFO - Shutdown standby master host' && end_flag=1" TERM INT
+    # Keep container running
+    while [ "${end_flag}" == '' ]; do
+        sleep 1
+    done
+}
+
 initialize_and_start_gpdb() {
     local pg_hba="${GREENPLUM_DATA_DIRECTORY}/${gp_master_dir_name}/${GREENPLUM_SEG_PREFIX}-1/pg_hba.conf"
     local pxf_env="${PXF_BASE}/conf/pxf-env.sh"
@@ -284,6 +313,9 @@ initialize_and_start_gpdb() {
     for host in $(cat ${gp_init_host_file}); do
         ssh-keyscan -t rsa $host >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
     done
+    if [ -n "${GREENPLUM_STANDBY_HOSTNAME:-}" ]; then
+        ssh-keyscan -t rsa "${GREENPLUM_STANDBY_HOSTNAME}" >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
+    fi
     chmod 644 /home/${GREENPLUM_USER}/.ssh/known_hosts
 
     # Fetch rsa ssh keys from hosts
@@ -393,6 +425,10 @@ initialize_and_start_gpdb() {
         echo "INFO - Restart GPDB"
         gpstop -ar
         sleep 10
+        if [ -n "${GREENPLUM_STANDBY_HOSTNAME:-}" ]; then
+            echo "INFO - Initialize standby master on ${GREENPLUM_STANDBY_HOSTNAME}"
+            gpinitstandby -a -s "${GREENPLUM_STANDBY_HOSTNAME}"
+        fi
     fi
     # If db name is set and diskquota is enabled, create extension and init table size table
     if [ "${GREENPLUM_DISKQUOTA_ENABLE}" == "true" ] && [ -n "${GREENPLUM_DATABASE_NAME:-}" ]; then
@@ -476,11 +512,20 @@ case ${GREENPLUM_DEPLOYMENT} in
         setup_gpinitsystem_config
         generate_gpinitsystem_config
         setup_hostfile_gpinitsystem
+        check_hostfile_gpinitsystem
         initialize_and_start_gpdb
         ;;
     "segment")
         setup_segment_authorized_keys
         initialize_and_start_gpdb_segments "$@"
+        ;;
+    "standby")
+        setup_version_config
+        setup_master
+        setup_segment_authorized_keys
+        setup_hostfile_gpinitsystem
+        check_hostfile_gpinitsystem
+        initialize_and_start_gpdb_standby
         ;;
     *)
         error_and_exit "Invalid deployment mode: ${GREENPLUM_DEPLOYMENT}"
