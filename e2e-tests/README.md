@@ -63,6 +63,48 @@ GREENPLUM_PASSWORD=$(cat ../docker-compose/secrets/gpdb_password) GP_VERSION=$(g
 docker compose -f docker-compose.s3.yml -f docker-compose.gpdb.yml -f docker-compose.gpdb-restore.yml down
 ```
 
+### Standby master tests
+
+The cluster is described in `../docker-compose/docker-compose.with_mirrors_and_standby.yaml`.
+
+The test validates standby master promotion and cluster recovery functionality:
+
+1. **Graceful failover test**:
+   - Stops the primary master gracefully
+   - Promotes the standby master to be the new primary
+   - Compares test data on the new primary
+   - Cleans up and initializes the old primary as a new standby master
+   - Verifies the standby replication state
+
+2. **Crash recovery test**:
+   - Simulates a crash by killing the primary master container
+   - Promotes the standby master
+   - Compares test data on the new primary
+   - Revives the crashed container, cleans up data, and re-initializes it as a standby
+   - Verifies the standby replication state
+
+Run:
+
+```bash
+make test-e2e-standby-coordinator
+```
+
+or
+
+```bash
+cd e2e-tests
+make test-e2e-standby-coordinator
+```
+
+or manually:
+
+```bash
+cd [docker-greenplum-root]/e2e-tests
+docker compose -f ../docker-compose/docker-compose.with_mirrors_and_standby.yaml up -d
+GREENPLUM_PASSWORD=$(cat ../docker-compose/secrets/gpdb_password) ./scripts/e2e-standby-coordinator-test.sh
+docker compose -f ../docker-compose/docker-compose.with_mirrors_and_standby.yaml down
+```
+
 ### Yezzey tests
 
 Cluster is described in `e2e-tests/docker-compose.yezzey.yml`, and S3 compatible storage is reused from `e2e-tests/docker-compose.s3.yml`.

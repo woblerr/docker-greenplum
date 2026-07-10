@@ -87,6 +87,10 @@ test-e2e:
 test-e2e-walg:
 	$(MAKE) -C e2e-tests test-e2e-walg
 
+.PHONY: test-e2e-standby-coordinator
+test-e2e-standby-coordinator:
+	$(MAKE) -C e2e-tests test-e2e-standby-coordinator
+
 .PHONY: test-e2e-yezzey
 test-e2e-yezzey:
 	$(MAKE) -C e2e-tests test-e2e-yezzey
