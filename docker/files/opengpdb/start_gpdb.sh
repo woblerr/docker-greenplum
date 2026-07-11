@@ -293,7 +293,7 @@ initialize_and_start_gpdb_standby() {
     if [ -n "${GREENPLUM_MASTER_HOSTNAME:-}" ]; then
         ssh-keyscan -t rsa "${GREENPLUM_MASTER_HOSTNAME}" >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
     else
-        echo "WARNING - GREENPLUM_MASTER_HOSTNAME is not set, skipping ssh-keyscan for master/coordinator"
+        error_and_exit "GREENPLUM_MASTER_HOSTNAME is required when GREENPLUM_DEPLOYMENT=standby; cannot add master's SSH host key to known_hosts."
     fi
     chmod 644 /home/${GREENPLUM_USER}/.ssh/known_hosts
     trap "echo 'INFO - Shutdown standby master host' && end_flag=1" TERM INT
