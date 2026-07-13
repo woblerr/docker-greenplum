@@ -1,0 +1,103 @@
+# This file is used to create a Greenplum cluster with configuration in separate containers:
+# 1 master
+# 1 standby master
+# 2 primary segments with mirrors
+# Without persistent volumes. For persistent volumes, uncomment the volumes section.
+
+version: '3'
+services:
+  master:
+    image: ${IMAGE_NAME}:${TAG}
+    container_name: master
+    hostname: master
+    ports:
+      - "${EXPOSE_MASTER_PORT}:5432"
+    environment:
+      - GREENPLUM_DEPLOYMENT=master
+      - GREENPLUM_GPPERFMON_ENABLE=true
+      - GREENPLUM_DISKQUOTA_ENABLE=true
+      - GREENPLUM_PXF_ENABLE=true
+      - GREENPLUM_PASSWORD_FILE=/run/secrets/gpdb_password
+      - GREENPLUM_GPMON_PASSWORD_FILE=/run/secrets/gpmon_password
+      - GREENPLUM_STANDBY_HOSTNAME=standby
+    secrets:
+      - gpdb_password
+      - gpmon_password
+    volumes:
+      # - gpdb-master-data:/data
+      # - ../docs/custom_init_scripts:/docker-entrypoint-initdb.d
+      - ./conf/${CONFIG_FOLDER}/gpinitsystem_config_with_mirrors:/tmp/gpinitsystem_config
+      - ./conf/hostfile_gpinitsystem:/tmp/hostfile_gpinitsystem
+      - ./conf/ssh/id_rsa:/home/gpadmin/.ssh/id_rsa
+      - ./conf/ssh/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
+    depends_on:
+      - segment1
+      - segment2
+      - standby
+    networks:
+      - greenplum
+
+  standby:
+    image: ${IMAGE_NAME}:${TAG}
+    container_name: standby
+    hostname: standby
+    ports:
+      - "${EXPOSE_MASTER_STANDBY_PORT}:5432"
+    environment:
+      - GREENPLUM_DEPLOYMENT=standby
+      - GREENPLUM_MASTER_HOSTNAME=master
+    volumes:
+      # - gpdb-standby-data:/data
+      - ./conf/ssh/authorized_keys:/tmp/authorized_keys
+      - ./conf/hostfile_gpinitsystem:/tmp/hostfile_gpinitsystem
+      - ./conf/ssh/id_rsa:/home/gpadmin/.ssh/id_rsa
+      - ./conf/ssh/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
+    stop_grace_period: 60s
+    depends_on:
+      - segment1
+      - segment2
+    networks:
+      - greenplum
+
+  segment1:
+    image: ${IMAGE_NAME}:${TAG}
+    container_name: segment1
+    hostname: segment1
+    command: /start_gpdb.sh "00:primary" "01:primary"  "00:mirror" "01:mirror"
+    environment:
+      - GREENPLUM_DEPLOYMENT=segment
+    volumes:
+      # - gpdb-segment1-data:/data
+      - ./conf/ssh/authorized_keys:/tmp/authorized_keys
+    stop_grace_period: 60s
+    networks:
+      - greenplum
+
+  segment2:
+    image: ${IMAGE_NAME}:${TAG}
+    container_name: segment2
+    hostname: segment2
+    command: /start_gpdb.sh "00:primary" "01:primary" "00:mirror" "01:mirror"
+    environment:
+      - GREENPLUM_DEPLOYMENT=segment
+    volumes:
+      # - gpdb-segment2-data:/data
+      - ./conf/ssh/authorized_keys:/tmp/authorized_keys
+    stop_grace_period: 60s
+    networks:
+      - greenplum
+
+networks:
+  greenplum:
+
+#volumes:
+#  gpdb-master-data:
+#  gpdb-standby-data:
+#  gpdb-segment1-data:
+#  gpdb-segment2-data:
+
+secrets:
+  gpdb_password:
+    file: ./secrets/gpdb_password
+  gpmon_password:
+    file: ./secrets/gpmon_password

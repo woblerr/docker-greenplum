@@ -87,6 +87,10 @@ test-e2e:
 test-e2e-walg:
 	$(MAKE) -C e2e-tests test-e2e-walg
 
+.PHONY: test-e2e-standby-master
+test-e2e-standby-master:
+	$(MAKE) -C e2e-tests test-e2e-standby-master
+
 .PHONY: test-e2e-yezzey
 test-e2e-yezzey:
 	$(MAKE) -C e2e-tests test-e2e-yezzey

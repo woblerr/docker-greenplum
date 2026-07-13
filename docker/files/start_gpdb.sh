@@ -156,6 +156,12 @@ generate_hostfile_gpinitsystem() {
     fi
 }
 
+check_hostfile_gpinitsystem() {
+    if [ ! -f "${gp_init_host_file}" ]; then
+        error_and_exit "Hostfile ${gp_init_host_file} is required but not found. Please mount hostfile_gpinitsystem."
+    fi
+}
+
 execute_custom_init_scripts() {
     local script
     if [ -d "${gp_custom_init_dir}" ] && [ -n "$(ls -A ${gp_custom_init_dir})" ]; then
@@ -205,6 +211,25 @@ initialize_and_start_gpdb_segments() {
     done
 }
 
+initialize_and_start_gpdb_standby() {
+    local end_flag=""
+    echo "INFO - Initializing standby master host"
+    for host in $(cat ${gp_init_host_file}); do
+        ssh-keyscan -t rsa $host >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
+    done
+    if [ -n "${GREENPLUM_MASTER_HOSTNAME:-}" ]; then
+        ssh-keyscan -t rsa "${GREENPLUM_MASTER_HOSTNAME}" >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
+    else
+        error_and_exit "GREENPLUM_MASTER_HOSTNAME is required when GREENPLUM_DEPLOYMENT=standby; cannot add master's SSH host key to known_hosts."
+    fi
+    chmod 644 /home/${GREENPLUM_USER}/.ssh/known_hosts
+    trap "echo 'INFO - Shutdown standby master host' && end_flag=1" TERM INT
+    # Keep container running
+    while [ "${end_flag}" == '' ]; do
+        sleep 1
+    done
+}
+
 initialize_and_start_gpdb() {
     local pg_hba="${GREENPLUM_DATA_DIRECTORY}/${gp_master_dir_name}/${GREENPLUM_SEG_PREFIX}-1/pg_hba.conf"
     local pxf_env="${PXF_BASE}/conf/pxf-env.sh"
@@ -215,6 +240,9 @@ initialize_and_start_gpdb() {
     for host in $(cat ${gp_init_host_file}); do
         ssh-keyscan -t rsa $host >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
     done
+    if [ -n "${GREENPLUM_STANDBY_HOSTNAME:-}" ]; then
+        ssh-keyscan -t rsa "${GREENPLUM_STANDBY_HOSTNAME}" >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
+    fi
     chmod 644 /home/${GREENPLUM_USER}/.ssh/known_hosts
 
     # Fetch rsa ssh keys from hosts
@@ -299,6 +327,10 @@ initialize_and_start_gpdb() {
         echo "INFO - Restart GPDB"
         gpstop -ar
         sleep 10
+        if [ -n "${GREENPLUM_STANDBY_HOSTNAME:-}" ]; then
+            echo "INFO - Initialize standby master on ${GREENPLUM_STANDBY_HOSTNAME}"
+            gpinitstandby -a -s "${GREENPLUM_STANDBY_HOSTNAME}"
+        fi
     fi
     # If db name is set and diskquota is enabled, create extension and init table size table
     if [ "${GREENPLUM_DISKQUOTA_ENABLE}" == "true" ] && [ -n "${GREENPLUM_DATABASE_NAME:-}" ]; then
@@ -364,11 +396,20 @@ case ${GREENPLUM_DEPLOYMENT} in
         setup_gpinitsystem_config
         generate_gpinitsystem_config
         setup_hostfile_gpinitsystem
+        check_hostfile_gpinitsystem
         initialize_and_start_gpdb
         ;;
     "segment")
         setup_segment_authorized_keys
         initialize_and_start_gpdb_segments "$@"
+        ;;
+    "standby")
+        setup_version_config
+        setup_master
+        setup_segment_authorized_keys
+        setup_hostfile_gpinitsystem
+        check_hostfile_gpinitsystem
+        initialize_and_start_gpdb_standby
         ;;
     *)
         error_and_exit "Invalid deployment mode: ${GREENPLUM_DEPLOYMENT}"

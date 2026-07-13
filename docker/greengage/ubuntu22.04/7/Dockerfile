@@ -288,6 +288,7 @@ RUN apt-get update \
         ca-certificates \
         tzdata \
         openjdk-17-jre \
+        fakeroot \
     && apt-get autoremove -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -320,16 +321,16 @@ RUN groupadd --gid ${GREENPLUM_GID} ${GREENPLUM_GROUP} \
     && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone
 
-COPY --from=go_builder /usr/local/greenplum-db /usr/local/greenplum-db
-COPY --from=go_builder \
+COPY --chown=${GREENPLUM_USER}:${GREENPLUM_GROUP} --from=go_builder /usr/local/greenplum-db /usr/local/greenplum-db
+COPY --chown=${GREENPLUM_USER}:${GREENPLUM_GROUP} --from=go_builder \
     /opt/go/bin/gpbackup \
     /opt/go/bin/gprestore \
     /opt/go/bin/gpbackup_helper \
     /usr/local/greenplum-db/bin/
-COPY --from=go_builder /opt/go/bin/gpbackup_s3_plugin /usr/local/greenplum-db/bin/gpbackup_s3_plugin
-COPY --from=go_builder /usr/local/pxf /usr/local/pxf
-COPY --from=go_builder /tmp/gpbackman/gpbackman /usr/local/greenplum-db/bin/gpbackman
-COPY --from=go_builder /tmp/wal-g/main/gp/wal-g /usr/local/greenplum-db/bin/wal-g
+COPY --chown=${GREENPLUM_USER}:${GREENPLUM_GROUP} --from=go_builder /opt/go/bin/gpbackup_s3_plugin /usr/local/greenplum-db/bin/gpbackup_s3_plugin
+COPY --chown=${GREENPLUM_USER}:${GREENPLUM_GROUP} --from=go_builder /usr/local/pxf /usr/local/pxf
+COPY --chown=${GREENPLUM_USER}:${GREENPLUM_GROUP} --from=go_builder /tmp/gpbackman/gpbackman /usr/local/greenplum-db/bin/gpbackman
+COPY --chown=${GREENPLUM_USER}:${GREENPLUM_GROUP} --from=go_builder /tmp/wal-g/main/gp/wal-g /usr/local/greenplum-db/bin/wal-g
 COPY --chmod=755 docker/files/entrypoint.sh /entrypoint.sh
 COPY --chmod=755 docker/files/start_gpdb.sh /start_gpdb.sh
 

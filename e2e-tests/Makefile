@@ -2,7 +2,29 @@ GPDB_PASSWORD := $(shell cat ../docker-compose/secrets/gpdb_password)
 CONFIG_FOLDER := $(shell grep '^CONFIG_FOLDER=' .env | head -1 | cut -d'=' -f2 | tr -d '"')
 
 .PHONY: test-e2e
-test-e2e: test-e2e-walg
+test-e2e: test-e2e-walg test-e2e-standby-master
+
+.PHONY: test-e2e-standby-master
+test-e2e-standby-master:
+	make test-e2e-standby-master-down
+	make test-e2e-standby-master-up
+	make test-e2e-standby-master-run
+	make test-e2e-standby-master-down
+
+.PHONY: test-e2e-standby-master-up
+test-e2e-standby-master-up:
+	@echo "INFO - Start e2e tests for standby master"
+	docker compose -f ../docker-compose/docker-compose.with_mirrors_and_standby.yaml up -d
+
+.PHONY: test-e2e-standby-master-run
+test-e2e-standby-master-run:
+	@echo "INFO - Run e2e tests for standby master"
+	GREENPLUM_PASSWORD=$(GPDB_PASSWORD) ./scripts/e2e-standby-master-test.sh
+
+.PHONY: test-e2e-standby-master-down
+test-e2e-standby-master-down:
+	@echo "INFO - Stop e2e tests for standby master"
+	docker compose -f ../docker-compose/docker-compose.with_mirrors_and_standby.yaml down
 
 .PHONY: test-e2e-walg
 test-e2e-walg: 
@@ -47,5 +69,3 @@ test-e2e-yezzey-run:
 test-e2e-yezzey-down:
 	@echo "INFO - Stop e2e tests for Yezzey"
 	docker compose -f docker-compose.s3.yml -f docker-compose.yezzey.yml down
-
-

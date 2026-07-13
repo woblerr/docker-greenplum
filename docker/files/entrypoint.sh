@@ -24,6 +24,13 @@ if [ "${uid}" = "0" ]; then
         mkdir -p /home/${GREENPLUM_USER}/pxf
         ssh-keygen -q -f /home/${GREENPLUM_USER}/.ssh/id_rsa -t rsa -N ""
     fi
+    # If user or group was customized.
+    if [ "${GREENPLUM_USER}" != "gpadmin" ] || [ "${GREENPLUM_UID}" != "1001" ] \
+        || [ "${GREENPLUM_GROUP}" != "gpadmin" ] || [ "${GREENPLUM_GID}" != "1001" ]; then
+        chown -R ${GREENPLUM_USER}:${GREENPLUM_GROUP} \
+          /usr/local/greenplum-db \
+          /usr/local/pxf
+    fi
     # Correct user:group.
     chown -R ${GREENPLUM_USER}:${GREENPLUM_GROUP} \
         /home/${GREENPLUM_USER} \

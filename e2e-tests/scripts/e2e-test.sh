@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-GP_USER=${GREENPLUM_USER:-gpadmin}
-GP_PASSWORD=${GREENPLUM_PASSWORD:-}
-GP_MASTER_PORT=${EXPOSE_MASTER_PORT:-5432}
+source "$(dirname "$0")/common.sh"
+
 GP_RESTORE_MASTER_PORT=${EXPOSE_RESTORE_MASTER_PORT:-6432}
-GP_DB_NAME=${GREENPLUM_DB_NAME:-demo}
 GP_VER=${GP_VERSION:-}
 
 WALG_CONFIG="/tmp/wal-g.yaml"
@@ -15,45 +13,11 @@ PRIMARY_MASTER_CONTAINER="master"
 RESTORE_MASTER_CONTAINER="master-restore"
 RP_NAME="rp1"
 
-# Check password is set
-if [ -z "$GP_PASSWORD" ]; then
-    echo "ERROR - GP_PASSWORD variable is not set"
-    exit 1
-fi
-
 # Check GP_VERSION is set
-if [ -z "$GP_VERSION" ]; then
+if [ -z "${GP_VER}" ]; then
     echo "ERROR - GP_VERSION variable is not set"
     exit 1
 fi
-
-exec_sql() {
-    local port=$1
-    local sql=$2
-    PGPASSWORD=${GP_PASSWORD} psql -h localhost -U ${GP_USER} -d ${GP_DB_NAME} -p ${port} -t -c "${sql}"
-}
-
-exec_docker(){
-    local container_name=$1
-    local cmd=$2
-    docker exec ${container_name} su - ${GP_USER} -c "${cmd}"
-}
-
-wait_for_service() {
-    local port=$1
-    local max_attempts=${2:-10}
-
-    for i in $(seq 1 ${max_attempts}); do
-        if exec_sql ${port} "SELECT 1;" >/dev/null 2>&1; then
-            echo "INFO - Cluster ready"
-            return 0
-        fi
-        echo "INFO - Waiting cluster startup ($i/${max_attempts})"
-        sleep 10
-    done
-    echo "ERROR - Cluster failed to start within timeout"
-    return 1
-}
 
 get_table_data() {
     local port=$1    
