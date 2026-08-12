@@ -392,18 +392,18 @@ make build_greengage_7_oraclelinux TAG_GREENGAGE_7=7.4.1
 
 For Ubuntu based images:
 ```bash
-make build_warehousepg_6_ubuntu TAG_WAREHOUSEPG_6=6.27.3-WHPG
+make build_warehousepg_6_ubuntu TAG_WAREHOUSEPG_6=6.27.5-WHPG
 ```
 ```
-make build_warehousepg_7_ubuntu TAG_WAREHOUSEPG_7=7.3.1-WHPG
+make build_warehousepg_7_ubuntu TAG_WAREHOUSEPG_7=7.4.1-WHPG
 ```
 
 For Oracle Linux based images:
 ```bash
-make build_warehousepg_6_oraclelinux TAG_WAREHOUSEPG_6=6.27.3-WHPG
+make build_warehousepg_6_oraclelinux TAG_WAREHOUSEPG_6=6.27.5-WHPG
 ```
 ```bash
-make build_warehousepg_7_oraclelinux TAG_WAREHOUSEPG_7=7.3.1-WHPG
+make build_warehousepg_7_oraclelinux TAG_WAREHOUSEPG_7=7.4.1-WHPG
 ```
 
 **open-gpdb:**
@@ -438,18 +438,18 @@ docker buildx build -f docker/greengage/oraclelinux8/7/Dockerfile -t greengage:7
 
 WarehousePG simple manual build:
 ```bash
-docker buildx build -f docker/warehousepg/ubuntu22.04/6/Dockerfile -t warehousepg:6.27.3-WHPG .
+docker buildx build -f docker/warehousepg/ubuntu22.04/6/Dockerfile -t warehousepg:6.27.5-WHPG .
 ```
 ```
-docker buildx build -f docker/warehousepg/ubuntu22.04/7/Dockerfile -t warehousepg:7.3.1-WHPG .
+docker buildx build -f docker/warehousepg/ubuntu22.04/7/Dockerfile -t warehousepg:7.4.1-WHPG .
 ```
 
 WarehousePG OracleLinux manual build:
 ```bash
-docker buildx build -f docker/warehousepg/oraclelinux8/6/Dockerfile -t warehousepg:6.27.3-WHPG-oraclelinux8 .
+docker buildx build -f docker/warehousepg/oraclelinux8/6/Dockerfile -t warehousepg:6.27.5-WHPG-oraclelinux8 .
 ```
 ```bash
-docker buildx build -f docker/warehousepg/oraclelinux8/7/Dockerfile -t warehousepg:7.3.1-WHPG-oraclelinux8 .
+docker buildx build -f docker/warehousepg/oraclelinux8/7/Dockerfile -t warehousepg:7.4.1-WHPG-oraclelinux8 .
 ```
 
 open-gpdb simple manual build:
