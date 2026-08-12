@@ -13,7 +13,7 @@ Before running tests:
 
 2. Configure test environment by editing `e2e-tests/.env` file if needed (default: `GPDB 6.27.1`, other supported: `Greengage`, `WarehousePG`, `open-gpdb`).
 
-3. Prepare password files as described in [Prepare section](../README.md#prepare) for Docker Compose. In tests used ssh keys from `e2e-tests/conf/ssh/` directory, so you can use them or create your own.
+3. Prepare password files as described in [Prepare section](../README.md#prepare) for Docker Compose. The tests use SSH keys from the `../docker-compose/conf/ssh/` directory, so you can use them or create your own.
 
 ## Running tests
 
