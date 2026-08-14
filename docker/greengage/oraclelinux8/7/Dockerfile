@@ -8,6 +8,7 @@
 # See https://github.com/GreengageDB/pxf/commit/1a873abd57983bf658822cb9b02a11b011116812
 # ----
 # Greengage 7 uses Python 3 (unlike Greengage 6 which used Python 2)
+# Python 3.12 is required for ggrebalance, which uses the standard dataclasses module.
 # ----
 # For compiling Greengage zstd static library (.a files) is needed.
 # See https://github.com/GreengageDB/greengage/commit/7185bf85ea8f4abdfdeb08d5a53180ea2f389728
@@ -19,13 +20,13 @@ ARG REPO_BUILD_TAG
 ARG OL_VERSION="8"
 ARG GOLANG_VERSION="1.25.11"
 ARG GPDB_DOWNLOAD_URL="https://github.com/GreengageDB/greengage/archive/refs/tags"
-ARG GPDB_VERSION="7.4.1"
+ARG GPDB_VERSION="7.5.0"
 ARG DISKQUOTA_DOWNLOAD_URL="https://github.com/GreengageDB/diskquota/archive/refs/tags"
 ARG DISKQUOTA_VERSION="2.4.1"
 ARG PXF_DOWNLOAD_URL="https://github.com/GreengageDB/pxf/archive/refs/tags"
-ARG PXF_VERSION="6.15.0"
+ARG PXF_VERSION="6.17.1"
 ARG GPBACKUP_DOWNLOAD_URL="https://github.com/GreengageDB/gpbackup/archive/refs/tags"
-ARG GPBACKUP_VERSION="1.31.1"
+ARG GPBACKUP_VERSION="1.31.2"
 ARG GPBACKUP_S3_PLUGIN_DOWNLOAD_URL="https://github.com/GreengageDB/gpbackup-s3-plugin/archive/refs/tags"
 ARG GPBACKUP_S3_PLUGIN_VERSION="1.11.0"
 ARG GPBACKMAN_DOWNLOAD_URL="https://github.com/woblerr/gpbackman/archive/refs/tags"
@@ -95,18 +96,19 @@ RUN dnf -y install \
         openssh-clients \
         openssh-server \
         openssl \
-        python3 \
-        python3-devel \
-        python3-pip \
-        python3-psutil \
-        python3-psycopg2 \
-        python3-setuptools \
-        python3-pyyaml \
+        python3.12 \
+        python3.12-devel \
+        python3.12-pip \
+        python3.12-psycopg2 \
+        python3.12-setuptools \
+        python3.12-pyyaml \
         sudo \
         java-17-openjdk-devel \
         wget \
         brotli-devel \
         libsodium-devel \
+    && alternatives --set python3 /usr/bin/python3.12 \
+    && python3 -m pip install --no-cache-dir psutil==5.9.8 \
     && dnf clean all \
     && rm -rf /var/cache/dnf \
     && echo -e "/usr/local/lib\n/usr/local/lib64\n" >> /etc/ld.so.conf.d/local.conf \
@@ -130,7 +132,8 @@ RUN wget ${GPDB_DOWNLOAD_URL}/${GPDB_VERSION}.tar.gz -O /tmp/gpdb-${GPDB_VERSION
     && tar -xzf /tmp/gpdb-${GPDB_VERSION}.tar.gz --strip-components=1 -C /tmp/gpdb \
     && cd /tmp/gpdb \
     && echo "${GPDB_VERSION} build dev" > /tmp/gpdb/VERSION \
-    && PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:${PKG_CONFIG_PATH}" \
+    && PYTHON=/usr/bin/python3.12 \
+       PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:${PKG_CONFIG_PATH}" \
         ./configure --prefix=/usr/local/greenplum-db \
         --enable-ic-proxy \
         --with-openssl \
@@ -156,7 +159,7 @@ RUN wget ${GPDB_DOWNLOAD_URL}/${GPDB_VERSION}.tar.gz -O /tmp/gpdb-${GPDB_VERSION
 
 # Now install PyGreSQL after Greenplum is copied
 # No available in EPEL
-RUN PATH=${PATH}:/usr/local/greenplum-db/bin pip3 install --no-cache-dir PyGreSQL
+RUN PATH=${PATH}:/usr/local/greenplum-db/bin python3 -m pip install --no-cache-dir PyGreSQL
 
 # diskquota
 RUN wget ${DISKQUOTA_DOWNLOAD_URL}/${DISKQUOTA_VERSION}.tar.gz -O /tmp/diskquota-${DISKQUOTA_VERSION}.tar.gz \
@@ -253,7 +256,8 @@ RUN wget ${PXF_DOWNLOAD_URL}/${PXF_VERSION}.tar.gz -O /tmp/pxf-${PXF_VERSION}.ta
        PG_CONFIG=/usr/local/greenplum-db/bin/pg_config \
        PXF_HOME=/usr/local/pxf \
        make -j2 -C cli install \
-    && GPHOME=/usr/local/greenplum-db \
+    && JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8" \
+       GPHOME=/usr/local/greenplum-db \
        PG_CONFIG=/usr/local/greenplum-db/bin/pg_config \
        PXF_HOME=/usr/local/pxf \
        make -j2 -C server install-server \
@@ -327,18 +331,18 @@ RUN dnf -y install \
         glibc-langpack-en \
         glibc-locale-source \
         iproute \
-        python3 \
-        python3-pip \
-        python3-psutil \
-        python3-psycopg2 \
-        python3-setuptools \
-        python3-pyyaml \
+        python3.12 \
+        python3.12-pip \
+        python3.12-psycopg2 \
+        python3.12-setuptools \
+        python3.12-pyyaml \
         sudo \
         wget \
         hostname \
         ca-certificates \
         tzdata \
         java-17-openjdk-headless \
+    && alternatives --set python3 /usr/bin/python3.12 \
     && dnf clean all \
     && rm -rf /var/cache/dnf
 
@@ -392,10 +396,11 @@ COPY --chown=${GREENPLUM_USER}:${GREENPLUM_GROUP} --from=builder \
     /usr/lib64/libxerces-c*.so* \
     /usr/local/greenplum-db/lib/
 
-# Install PyGreSQL
-RUN dnf -y install gcc python3-devel \
-    && PATH=${PATH}:/usr/local/greenplum-db/bin pip3 install --no-cache-dir PyGreSQL \
-    && dnf -y remove gcc python3-devel \
+# Install Python packages not available for Python 3.12 in Oracle Linux repositories
+RUN dnf -y install gcc python3.12-devel \
+    && PATH=${PATH}:/usr/local/greenplum-db/bin \
+       python3 -m pip install --no-cache-dir psutil==5.9.8 PyGreSQL \
+    && dnf -y remove gcc python3.12-devel \
     && dnf clean all \
     && rm -rf /var/cache/dnf
 

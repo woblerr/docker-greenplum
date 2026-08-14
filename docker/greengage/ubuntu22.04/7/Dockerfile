@@ -11,13 +11,13 @@ ARG REPO_BUILD_TAG
 ARG UBUNTU_VERSION="22.04"
 ARG GOLANG_VERSION="1.25.11"
 ARG GPDB_DOWNLOAD_URL="https://github.com/GreengageDB/greengage/archive/refs/tags"
-ARG GPDB_VERSION="7.4.1"
+ARG GPDB_VERSION="7.5.0"
 ARG DISKQUOTA_DOWNLOAD_URL="https://github.com/GreengageDB/diskquota/archive/refs/tags"
 ARG DISKQUOTA_VERSION="2.4.1"
 ARG PXF_DOWNLOAD_URL="https://github.com/GreengageDB/pxf/archive/refs/tags"
-ARG PXF_VERSION="6.15.0"
+ARG PXF_VERSION="6.17.1"
 ARG GPBACKUP_DOWNLOAD_URL="https://github.com/GreengageDB/gpbackup/archive/refs/tags"
-ARG GPBACKUP_VERSION="1.31.1"
+ARG GPBACKUP_VERSION="1.31.2"
 ARG GPBACKUP_S3_PLUGIN_DOWNLOAD_URL="https://github.com/GreengageDB/gpbackup-s3-plugin/archive/refs/tags"
 ARG GPBACKUP_S3_PLUGIN_VERSION="1.11.0"
 ARG GPBACKMAN_DOWNLOAD_URL="https://github.com/woblerr/gpbackman/archive/refs/tags"
@@ -212,7 +212,8 @@ RUN wget ${PXF_DOWNLOAD_URL}/${PXF_VERSION}.tar.gz -O /tmp/pxf-${PXF_VERSION}.ta
        PG_CONFIG=/usr/local/greenplum-db/bin/pg_config \
        PXF_HOME=/usr/local/pxf \
        make -j2 -C cli install \
-    && GPHOME=/usr/local/greenplum-db \
+    && JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8" \
+       GPHOME=/usr/local/greenplum-db \
        PG_CONFIG=/usr/local/greenplum-db/bin/pg_config \
        PXF_HOME=/usr/local/pxf \
        make -j2 -C server install-server \
