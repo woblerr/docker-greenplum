@@ -20,7 +20,7 @@ Use the root `Makefile` for builds. Verified build targets include:
 make build_gpdb_6_ubuntu TAG_GPDB_6=6.27.1
 make build_gpdb_7_ubuntu TAG_GPDB_7=7.1.0
 make build_greengage_6_ubuntu TAG_GREENGAGE_6=6.31.0
-make build_greengage_7_ubuntu TAG_GREENGAGE_7=7.4.1
+make build_greengage_7_ubuntu TAG_GREENGAGE_7=7.5.0
 make build_warehousepg_6_ubuntu TAG_WAREHOUSEPG_6=6.27.5-WHPG
 make build_warehousepg_7_ubuntu TAG_WAREHOUSEPG_7=7.4.1-WHPG
 make build_opengpdb_6_ubuntu TAG_OPENGPDB_6=6.29.8
