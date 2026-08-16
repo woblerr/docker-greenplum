@@ -14,16 +14,16 @@ This repository builds Docker images for Greenplum-compatible databases: Greenpl
 
 ## Build, Test, and Lint
 
-Use the root `Makefile` for builds. Verified build targets include:
+Use the root `Makefile` for builds. It defines the current default image tags; do not duplicate those version values here. Verified build targets include:
 
 ```bash
-make build_gpdb_6_ubuntu TAG_GPDB_6=6.27.1
-make build_gpdb_7_ubuntu TAG_GPDB_7=7.1.0
-make build_greengage_6_ubuntu TAG_GREENGAGE_6=6.31.0
-make build_greengage_7_ubuntu TAG_GREENGAGE_7=7.5.0
-make build_warehousepg_6_ubuntu TAG_WAREHOUSEPG_6=6.27.5-WHPG
-make build_warehousepg_7_ubuntu TAG_WAREHOUSEPG_7=7.4.1-WHPG
-make build_opengpdb_6_ubuntu TAG_OPENGPDB_6=6.29.8
+make build_gpdb_6_ubuntu
+make build_gpdb_7_ubuntu
+make build_greengage_6_ubuntu
+make build_greengage_7_ubuntu
+make build_warehousepg_6_ubuntu
+make build_warehousepg_7_ubuntu
+make build_opengpdb_6_ubuntu
 ```
 
 For Greenplum, Greengage, and WarehousePG, matching Oracle Linux targets exist with `_oraclelinux` instead of `_ubuntu`. open-gpdb has only `build_opengpdb_6_ubuntu`.
@@ -73,7 +73,7 @@ Keep the following surfaces synchronized according to the type of change:
 For Makefile or Dockerfile changes, inspect the relevant build routing with `make -n`, for example:
 
 ```bash
-make -n build_gpdb_6_ubuntu TAG_GPDB_6=6.27.1
+make -n build_gpdb_6_ubuntu
 ```
 
 A dry run validates command expansion only; it does not prove that the image builds successfully.
