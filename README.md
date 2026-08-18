@@ -394,7 +394,7 @@ For Ubuntu based images:
 ```bash
 make build_warehousepg_6_ubuntu TAG_WAREHOUSEPG_6=6.27.5-WHPG
 ```
-```
+```bash
 make build_warehousepg_7_ubuntu TAG_WAREHOUSEPG_7=7.5.0-WHPG
 ```
 
@@ -440,7 +440,7 @@ WarehousePG simple manual build:
 ```bash
 docker buildx build -f docker/warehousepg/ubuntu22.04/6/Dockerfile -t warehousepg:6.27.5-WHPG .
 ```
-```
+```bash
 docker buildx build -f docker/warehousepg/ubuntu22.04/7/Dockerfile -t warehousepg:7.5.0-WHPG .
 ```
 
