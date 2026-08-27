@@ -5,7 +5,7 @@
 # ----
 ARG REPO_BUILD_TAG
 ARG UBUNTU_VERSION="22.04"
-ARG GOLANG_VERSION="1.25.11"
+ARG GOLANG_VERSION="1.25.14"
 ARG GPXERCES_DOWNLOAD_URL="https://github.com/woblerr/gp-xerces/archive/refs/tags"
 ARG GPXERCES_VERSION="v3.1.2-p1"
 ARG LIBSIGAR_DOWNLOAD_URL="https://github.com/boundary/sigar"

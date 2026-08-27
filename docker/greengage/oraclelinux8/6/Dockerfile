@@ -17,7 +17,7 @@
 # ----
 ARG REPO_BUILD_TAG
 ARG OL_VERSION="8"
-ARG GOLANG_VERSION="1.25.11"
+ARG GOLANG_VERSION="1.25.14"
 ARG LIBSIGAR_DOWNLOAD_URL="https://github.com/boundary/sigar"
 ARG LIBSIGAR_COMMIT_HASH="e8961a6674cc4d292e61b353b5c36bfc345434cc"
 ARG GPDB_REPO_URL="https://github.com/GreengageDB/greengage.git"
