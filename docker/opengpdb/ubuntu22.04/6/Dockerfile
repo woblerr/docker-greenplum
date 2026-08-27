@@ -19,7 +19,7 @@ ARG GPBACKMAN_DOWNLOAD_URL="https://github.com/woblerr/gpbackman/archive/refs/ta
 ARG GPBACKMAN_VERSION="v0.12.0"
 ARG WALG_DOWNLOAD_URL="https://github.com/wal-g/wal-g"
 # Wait new WAL-G release
-ARG WALG_VERSION="e4843b849ca05a27655794888341de2662035853"
+ARG WALG_VERSION="v3.0.9"
 ARG YPROXY_DOWNLOAD_URL="https://github.com/open-gpdb/yproxy/archive/refs/tags"
 ARG YPROXY_VERSION="1.7.5"
 ARG YEZZEY_DOWNLOAD_URL="https://github.com/open-gpdb/yezzey"
