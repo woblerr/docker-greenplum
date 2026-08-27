@@ -6,7 +6,7 @@ ARG GPXERCES_VERSION="v3.1.2-p1"
 ARG LIBSIGAR_DOWNLOAD_URL="https://github.com/boundary/sigar"
 ARG LIBSIGAR_COMMIT_HASH="e8961a6674cc4d292e61b353b5c36bfc345434cc"
 ARG GPDB_DOWNLOAD_URL="https://github.com/open-gpdb/gpdb/archive/refs/tags"
-ARG GPDB_VERSION="6.29.8"
+ARG GPDB_VERSION="6.29.9"
 ARG DISKQUOTA_DOWNLOAD_URL="https://github.com/woblerr/diskquota/archive/refs/tags"
 ARG DISKQUOTA_VERSION="2.3.0"
 ARG PXF_DOWNLOAD_URL="https://github.com/open-gpdb/pxf/archive/refs/tags"
@@ -21,9 +21,9 @@ ARG WALG_DOWNLOAD_URL="https://github.com/wal-g/wal-g"
 # Wait new WAL-G release
 ARG WALG_VERSION="e4843b849ca05a27655794888341de2662035853"
 ARG YPROXY_DOWNLOAD_URL="https://github.com/open-gpdb/yproxy/archive/refs/tags"
-ARG YPROXY_VERSION="1.7.5"
+ARG YPROXY_VERSION="1.7.7"
 ARG YEZZEY_DOWNLOAD_URL="https://github.com/open-gpdb/yezzey"
-ARG YEZZEY_VERSION="1.8.8"
+ARG YEZZEY_VERSION="1.8.10"
 
 FROM ubuntu:${UBUNTU_VERSION} AS builder
 

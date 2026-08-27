@@ -14,7 +14,7 @@ This document describes how to use Yezzey and Yproxy in the open-gpdb image. Thi
 
 ## Requirements
 
-- `opengpdb` image (e.g., `opengpdb:6.29.8`).
+- `opengpdb` image (e.g., `opengpdb:6.29.9`).
 - S3-compatible storage.
 - `yproxy.yaml` configuration file.
 
@@ -62,7 +62,7 @@ docker run -p 5432:5432 \
   -e GREENPLUM_PASSWORD=gparray \
   -e GREENPLUM_YEZZEY_ENABLE=true \
   -v $(pwd)/yproxy.yaml:/data/yproxy.yaml \
-  -d opengpdb:6.29.8
+  -d opengpdb:6.29.9
 ```
 
 ### Multi-node Cluster
@@ -77,7 +77,7 @@ Example for master:
 ```yaml
 services:
   master:
-    image: opengpdb:6.29.8
+    image: opengpdb:6.29.9
     environment:
       - GREENPLUM_DEPLOYMENT=master
       - GREENPLUM_YEZZEY_ENABLE=true
@@ -91,7 +91,7 @@ Example for segment:
 ```yaml
 services:
   segment1:
-    image: opengpdb:6.29.8
+    image: opengpdb:6.29.9
     command: /start_gpdb.sh "00:primary" "01:primary"
     environment:
       - GREENPLUM_DEPLOYMENT=segment
