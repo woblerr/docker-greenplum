@@ -18,7 +18,7 @@
 # ----
 ARG REPO_BUILD_TAG
 ARG OL_VERSION="8"
-ARG GOLANG_VERSION="1.25.11"
+ARG GOLANG_VERSION="1.25.14"
 ARG GPDB_DOWNLOAD_URL="https://github.com/GreengageDB/greengage/archive/refs/tags"
 ARG GPDB_VERSION="7.5.0"
 ARG DISKQUOTA_DOWNLOAD_URL="https://github.com/GreengageDB/diskquota/archive/refs/tags"
@@ -33,7 +33,7 @@ ARG GPBACKMAN_DOWNLOAD_URL="https://github.com/woblerr/gpbackman/archive/refs/ta
 ARG GPBACKMAN_VERSION="v0.12.0"
 ARG WALG_DOWNLOAD_URL="https://github.com/wal-g/wal-g"
 # Wait new WAL-G release
-ARG WALG_VERSION="e4843b849ca05a27655794888341de2662035853"
+ARG WALG_VERSION="v3.0.9"
 ARG GOSU_VERSION="1.19"
 ARG ZSTD_VERSION="1.5.7"
 ARG ZSTD_DOWNLOAD_URL="https://github.com/facebook/zstd/archive/refs/tags"
