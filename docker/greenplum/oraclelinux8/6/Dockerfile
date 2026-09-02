@@ -16,7 +16,7 @@ ARG GPBACKUP_VERSION="1.30.5"
 ARG GPBACKUP_S3_PLUGIN_DOWNLOAD_URL="https://github.com/woblerr/gpbackup-s3-plugin/archive/refs/tags"
 ARG GPBACKUP_S3_PLUGIN_VERSION="1.10.2"
 ARG GPBACKMAN_DOWNLOAD_URL="https://github.com/woblerr/gpbackman/archive/refs/tags"
-ARG GPBACKMAN_VERSION="v0.12.0"
+ARG GPBACKMAN_VERSION="v0.13.0"
 ARG WALG_DOWNLOAD_URL="https://github.com/wal-g/wal-g"
 # Wait new WAL-G release
 ARG WALG_VERSION="v3.0.9"
