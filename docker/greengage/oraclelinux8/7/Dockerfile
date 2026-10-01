@@ -20,7 +20,7 @@ ARG REPO_BUILD_TAG
 ARG OL_VERSION="8"
 ARG GOLANG_VERSION="1.25.14"
 ARG GPDB_DOWNLOAD_URL="https://github.com/GreengageDB/greengage/archive/refs/tags"
-ARG GPDB_VERSION="7.5.0"
+ARG GPDB_VERSION="7.5.1"
 ARG DISKQUOTA_DOWNLOAD_URL="https://github.com/GreengageDB/diskquota/archive/refs/tags"
 ARG DISKQUOTA_VERSION="2.4.1"
 ARG PXF_DOWNLOAD_URL="https://github.com/GreengageDB/pxf/archive/refs/tags"
