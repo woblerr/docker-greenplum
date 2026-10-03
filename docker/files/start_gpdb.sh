@@ -215,10 +215,10 @@ initialize_and_start_gpdb_standby() {
     local end_flag=""
     echo "INFO - Initializing standby master host"
     for host in $(cat ${gp_init_host_file}); do
-        ssh-keyscan -t rsa $host >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
+        ssh-keyscan -t rsa $host >> /home/${GREENPLUM_USER}/.ssh/known_hosts
     done
     if [ -n "${GREENPLUM_MASTER_HOSTNAME:-}" ]; then
-        ssh-keyscan -t rsa "${GREENPLUM_MASTER_HOSTNAME}" >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
+        ssh-keyscan -t rsa "${GREENPLUM_MASTER_HOSTNAME}" >> /home/${GREENPLUM_USER}/.ssh/known_hosts
     else
         error_and_exit "GREENPLUM_MASTER_HOSTNAME is required when GREENPLUM_DEPLOYMENT=standby; cannot add master's SSH host key to known_hosts."
     fi
@@ -238,10 +238,10 @@ initialize_and_start_gpdb() {
 
     # Scan and add host keys
     for host in $(cat ${gp_init_host_file}); do
-        ssh-keyscan -t rsa $host >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
+        ssh-keyscan -t rsa $host >> /home/${GREENPLUM_USER}/.ssh/known_hosts
     done
     if [ -n "${GREENPLUM_STANDBY_HOSTNAME:-}" ]; then
-        ssh-keyscan -t rsa "${GREENPLUM_STANDBY_HOSTNAME}" >> /home/${GREENPLUM_USER}/.ssh/known_hosts 2>/dev/null
+        ssh-keyscan -t rsa "${GREENPLUM_STANDBY_HOSTNAME}" >> /home/${GREENPLUM_USER}/.ssh/known_hosts
     fi
     chmod 644 /home/${GREENPLUM_USER}/.ssh/known_hosts
 
