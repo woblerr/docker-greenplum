@@ -350,24 +350,6 @@ Run cluster with 1 master, 1 standby master and 2 segments with mirroring:
 docker compose -f ./docker-compose/docker-compose.with_mirrors_and_standby.yaml up -d
 ```
 
-## Upgrading Greengage 6
-
-Greengage [6.32.0](https://greengagedb.org/en/product-releases/greengagedb/6-32-0.html) fixes CVE-2026-6478 in authentication and several security issues in `credcheck`. The image continues to use the existing startup scripts and configuration paths.
-
-For an existing 6.31.0 cluster with persistent `/data`, follow the upstream [upgrade guidance](https://greengagedb.org/en/docs-gg/current/upgrade_cluster.html):
-
-1. Record the current image digests and take a consistent backup of all cluster data directories, configuration, and mounted volumes. Verify that the backup can be restored.
-2. Stop the entire cluster before replacing the images on the master, standby, segments, and mirrors. This is an upgrade within major version 6; `ggupgrade` is not required.
-3. Start the cluster with 6.32.0 and validate data, roles, authentication, extensions, and backup/restore before allowing application writes. See the [Greengage 6 validation checklist](e2e-tests/README.md#greengage-6-validation).
-
-### credcheck password history
-
-If `credcheck` password history is enabled, [6.32.0 changes its hash format](https://github.com/GreengageDB/greengage/pull/639). The previous history is discarded when loaded, so restrictions on reusing passwords from that history are lost. The SQL extension version remains `4.6.0`; `ALTER EXTENSION UPDATE` does not migrate the history. Agree on this reset before upgrading a cluster that depends on password reuse restrictions. After starting 6.32.0 with history enabled, rotate passwords to populate the new history before allowing application writes.
-
-Check for old `pg_password_history` files in master, standby, segment, and mirror data directories. Segment copies are removed automatically when `credcheck` is loaded through `shared_preload_libraries`; where it is loaded only on the master, remove stale segment and mirror copies manually. Existing physical backups can still contain unsalted hashes of previous and current passwords. Restrict access to those backups and rotate passwords if the backup storage is less trusted than the cluster.
-
-For rollback, stop the cluster and restore the consistent backup with the recorded 6.31.0 images. Changing the image tag alone does not restore the discarded password history. If application writes have resumed, account for those writes before restoring the backup.
-
 ## Build
 
 **Greenplum:**

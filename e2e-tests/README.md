@@ -22,34 +22,6 @@ Run all tests:
 make test-e2e
 ``` 
 
-### Greengage 6 validation
-
-Validate Greengage 6.32.0 on Ubuntu 22.04 and Oracle Linux 8, on both `linux/amd64` and `linux/arm64`. Successful image builds do not establish runtime compatibility. Use disposable clusters for these checks: the existing suites stop containers, simulate crashes, and remove test data directories.
-
-The following commands run the existing WAL-G and standby master suites from the repository root against locally available images. Both example `.env` files select Greenplum by default, so override the image and configuration explicitly:
-
-```bash
-export IMAGE_NAME=greengage
-export TAG=6.32.0-ubuntu22.04
-export RESTORE_TAG=6.32.0-ubuntu22.04
-export CONFIG_FOLDER=6
-export RESTORE_CONFIG_FOLDER=6
-make test-e2e CONFIG_FOLDER=6
-```
-
-For Oracle Linux, set both `TAG` and `RESTORE_TAG` to `6.32.0-oraclelinux8` and repeat on each architecture. The Make argument `CONFIG_FOLDER=6` also overrides the value that the test Makefile reads directly from `.env`. Do not use `make -n` with e2e targets: the test Makefile reads the password file while expanding commands.
-
-The existing suites cover WAL-G backup/PITR and standby promotion. Complete the following additional checks separately:
-
-1. **Startup and extensions.** Initialize single-node and multi-node clusters, restart with existing `/data`, and verify custom initialization scripts run only on a new cluster. Check the `greenplum_path.sh` symlink, Python module imports, and binary versions. With the corresponding features enabled, verify gpperfmon metrics, diskquota accounting and quota enforcement, PXF external-table reads/writes, and `gp_pitr`. Confirm that `credcheck` and `pg_cron` are installed; they do not need to be enabled by default.
-2. **Authentication.** Check successful and rejected password authentication over TCP using a connection that matches an MD5 rule rather than `trust`. Test SCRAM and deployed client versions; include LDAP/PAM/Kerberos/RADIUS where configured. CVE-2026-6478 verification should include the upstream [constant-time comparison fix](https://github.com/GreengageDB/greengage/pull/606) in the source used for the build, rather than relying on response-time measurements.
-3. **credcheck.** Enable `credcheck` through `shared_preload_libraries` on a disposable cluster and exercise the [6.32.0 regression cases](https://github.com/GreengageDB/greengage/tree/6.32.0/gpcontrib/credcheck/test/sql). With `credcheck.password_valid_until` enabled, a non-superuser must be able to change its own password but must not gain `SUPERUSER`, `CREATEROLE`, or `CREATEDB`. Reject password-policy violations in multi-statement queries and `DO` blocks. Deny ordinary roles access to both the password-history view and function, while allowing superuser access. Set the same password for two test roles and verify different history hashes. Verify new history survives restart and standby promotion.
-4. **Backup consumers.** Run gpbackup/gprestore with local storage and the S3 plugin for heap, AO/AOCS, and partitioned tables, roles, and extensions. Check gpbackman reads the resulting `gpbackup_history.db`; if gpbackup_exporter is deployed, verify its status and backup metrics against that history.
-5. **Existing data.** On a copy of a 6.31.0 cluster, prepare representative data, roles, extensions, and an enabled `credcheck` history. Stop all nodes and upgrade to 6.32.0 using the [upgrade procedure](../README.md#upgrading-greengage-6). Check data and privileges, the expected reset of old history, creation of new history, and stale history files on segments and mirrors. Also restore a WAL-G backup made by 6.31.0 into a separate 6.32.0 cluster.
-6. **Standby and rollback.** Require `gpactivatestandby` to return `0`; a run that takes the existing Cloudberry exit-code-2 workaround is not a successful Greengage validation. Check consumers of `gpstate -e` and `EXPLAIN ANALYZE` output. Rehearse restoring the saved cluster backup with the old image digests and verify data, roles, authentication, and backup operations.
-
-Record the source revision, image digests, OS/architecture, and results for each check. Treat failed authentication, extension loading, backup/restore, promotion, or data comparisons as blockers. Confirm acceptance of the password-history reset before upgrading a cluster that relies on it. Yezzey tests apply only to open-gpdb.
-
 ### WAL-G tests
 
 Primary cluster is described in `e2e-tests/docker-compose.gpdb.yml`, standby cluster is described in `e2e-tests/docker-compose.gpdb-restore.yml`, and S3 compatible storage is described in `e2e-tests/docker-compose.s3.yml`.
