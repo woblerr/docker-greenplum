@@ -79,7 +79,7 @@ Greenplum 7:
 Greengage 6:
 | Image | Greengage Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
 |---|---|---|---| ---|
-| greengage | 6.31.0| `6.31.0`, `6.31.0-ubuntu22.04` | `6.31.0-oraclelinux8` | `linux/amd64`, `linux/arm64` |
+| greengage | 6.32.0| `6.32.0`, `6.32.0-ubuntu22.04` | `6.32.0-oraclelinux8` | `linux/amd64`, `linux/arm64` |
 
 Greengage 7:
 | Image | Greengage Version | Ubuntu 22.04 | Oracle Linux 8 | Platform |
@@ -374,7 +374,7 @@ make build_gpdb_7_oraclelinux TAG_GPDB_7=7.1.0
 
 For Ubuntu based images:
 ```bash
-make build_greengage_6_ubuntu TAG_GREENGAGE_6=6.31.0
+make build_greengage_6_ubuntu TAG_GREENGAGE_6=6.32.0
 ```
 ```bash
 make build_greengage_7_ubuntu TAG_GREENGAGE_7=7.5.1
@@ -382,7 +382,7 @@ make build_greengage_7_ubuntu TAG_GREENGAGE_7=7.5.1
 
 For Oracle Linux based images:
 ```bash
-make build_greengage_6_oraclelinux TAG_GREENGAGE_6=6.31.0
+make build_greengage_6_oraclelinux TAG_GREENGAGE_6=6.32.0
 ```
 ```bash
 make build_greengage_7_oraclelinux TAG_GREENGAGE_7=7.5.1
@@ -422,7 +422,7 @@ docker buildx build -f docker/greenplum/ubuntu22.04/6/Dockerfile -t greenplum:6.
 
 Greengage simple manual build:
 ```bash
-docker buildx build -f docker/greengage/ubuntu22.04/6/Dockerfile -t greengage:6.31.0 .
+docker buildx build -f docker/greengage/ubuntu22.04/6/Dockerfile -t greengage:6.32.0 .
 ```
 ```bash
 docker buildx build -f docker/greengage/ubuntu22.04/7/Dockerfile -t greengage:7.5.1 .
@@ -430,7 +430,7 @@ docker buildx build -f docker/greengage/ubuntu22.04/7/Dockerfile -t greengage:7.
 
 Greengage OracleLinux manual build:
 ```bash
-docker buildx build -f docker/greengage/oraclelinux8/6/Dockerfile -t greengage:6.31.0-oraclelinux8 .
+docker buildx build -f docker/greengage/oraclelinux8/6/Dockerfile -t greengage:6.32.0-oraclelinux8 .
 ```
 ```bash
 docker buildx build -f docker/greengage/oraclelinux8/7/Dockerfile -t greengage:7.5.1-oraclelinux8 .
