@@ -34,7 +34,7 @@ ARG GPBACKMAN_VERSION="v0.13.0"
 ARG WALG_DOWNLOAD_URL="https://github.com/wal-g/wal-g"
 # Wait new WAL-G release
 ARG WALG_VERSION="v3.0.9"
-ARG GOSU_VERSION="1.19"
+ARG GOSU_VERSION="1.20"
 ARG ZSTD_VERSION="1.5.7"
 ARG ZSTD_DOWNLOAD_URL="https://github.com/facebook/zstd/archive/refs/tags"
 
